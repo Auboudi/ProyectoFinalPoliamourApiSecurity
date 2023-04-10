@@ -65,7 +65,7 @@ public class UserController {
     private YardService yardService;
 
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<User>> findAll(@RequestParam(name = "page", required = false) Integer page,
             @RequestParam(name = "size", required = false) Integer size) {
 
@@ -102,7 +102,7 @@ public class UserController {
 
     }
 
-    @PostMapping(consumes = "multipart/form-data")
+    @PostMapping(value = "/add" , consumes = "multipart/form-data")
     @Transactional
     public ResponseEntity<Map<String, Object>> insert(@Valid 
                 @RequestPart(name = "user") User user, 
@@ -221,13 +221,13 @@ public class UserController {
         return responseEntity;
     }    
 
-    @PutMapping("/{id}")
+    @PutMapping("/update")
     @Transactional
     public ResponseEntity<Map<String, Object>> update(
             @Valid @RequestPart(name = "user") User user,
             BindingResult result, 
             @RequestPart(name = "fileUser", required = false) MultipartFile fileUser,
-            @PathVariable(name = "id") Integer id) throws IOException {
+            @RequestPart(name = "email", required = false) String email) throws IOException {
 
         Map<String, Object> responseAsMap = new HashMap<>();
         ResponseEntity<Map<String, Object>> responseEntity = null;
@@ -260,7 +260,7 @@ public class UserController {
             responseAsMap.put("info de la imagen: ", fileUploadResponse);
         }
 
-        user.setId(id);
+        user.setEmail(email);
         User userDB = userService.save(user);
 
         
@@ -372,18 +372,6 @@ public class UserController {
 
 
 
-    // Métodos del Security
-    @GetMapping("/all")
-    public ResponseEntity<List<User>> getAllUsers() {
-        return new ResponseEntity<>(userService.findAll(), HttpStatus.FOUND);
-    }
-
-    @PostMapping("/add")
-    @Transactional
-    public ResponseEntity<User> add(@RequestBody User user) {
-        return ResponseEntity.ok(userService.add(user));
-    }
-
     @GetMapping("/{email}")
     public User getByEmail(@PathVariable("email") String email) {
         return userService.findByEmail(email);
@@ -395,9 +383,9 @@ public class UserController {
         userService.deleteByEmail(email);
     }
 
-    @PutMapping("/update")
-    @Transactional
-    public ResponseEntity<User> update(@RequestBody User user) {
-        return ResponseEntity.ok(userService.update(user));
-    }
+    // @PutMapping("/update")
+    // @Transactional
+    // public ResponseEntity<User> update(@RequestBody User user) {
+    //     return ResponseEntity.ok(userService.update(user));
+    // }
 }

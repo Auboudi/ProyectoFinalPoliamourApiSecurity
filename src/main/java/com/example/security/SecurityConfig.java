@@ -40,8 +40,8 @@ public class SecurityConfig {
 
     }
 
-    // public static void main(String[] args) {
-    //     System.out.println(new SecurityConfig().passwordEncoder().encode("xxx"));
-    // }
+    public static void main(String[] args) {
+        System.out.println(new SecurityConfig().passwordEncoder().encode("xxx"));
+    }
 
 }
