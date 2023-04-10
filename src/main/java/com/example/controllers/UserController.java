@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessException;
@@ -24,13 +26,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.DTO.UserDto;
 import com.example.entities.Department;
 import com.example.entities.User;
 import com.example.entities.Yard;
@@ -63,6 +65,9 @@ public class UserController {
 
     @Autowired
     private YardService yardService;
+
+    @Autowired
+    private ModelMapper modelMapper;
 
 //BUSQUEDA PARA ADMINS 
 
@@ -390,10 +395,15 @@ public class UserController {
 
     //BUSQUEDA PARA USERS 
 
-    
-    // @PutMapping("/update")
-    // @Transactional
-    // public ResponseEntity<User> update(@RequestBody User user) {
-    //     return ResponseEntity.ok(userService.update(user));
-    // }
+//GETALL
+
+@GetMapping("/usersAll")
+	public List<UserDto> findAll() {
+		return userService.findAll().stream().map(p -> modelMapper.map(p, UserDto.class))
+				.collect(Collectors.toList());
+	}
+
+
+   
+   
 }
