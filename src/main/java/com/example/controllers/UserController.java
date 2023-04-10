@@ -149,7 +149,7 @@ public class UserController {
             responseAsMap.put("info de la imagen: ", fileUploadResponse);
         }
 
-        User userDB = userService.save(user);
+        User userDB = userService.add(user);
 
         try {
 
@@ -226,8 +226,10 @@ public class UserController {
     public ResponseEntity<Map<String, Object>> update(
             @Valid @RequestPart(name = "user") User user,
             BindingResult result, 
-            @RequestPart(name = "fileUser", required = false) MultipartFile fileUser,
-            @RequestPart(name = "email", required = false) String email) throws IOException {
+            @RequestPart(name = "fileUser", required = false) MultipartFile fileUser)
+            // ,
+            // @RequestPart(name = "email", required = false) String email) 
+            throws IOException {
 
         Map<String, Object> responseAsMap = new HashMap<>();
         ResponseEntity<Map<String, Object>> responseEntity = null;
@@ -260,8 +262,8 @@ public class UserController {
             responseAsMap.put("info de la imagen: ", fileUploadResponse);
         }
 
-        user.setEmail(email);
-        User userDB = userService.save(user);
+    //    user.setEmail(email);
+        User userDB = userService.update(user);
 
         
         try {
@@ -372,12 +374,12 @@ public class UserController {
 
 
 
-    @GetMapping("/{email}")
+    @GetMapping("/email/{email}")
     public User getByEmail(@PathVariable("email") String email) {
         return userService.findByEmail(email);
     }
 
-    @DeleteMapping("/{email}")
+    @DeleteMapping("/email/{email}")
     @Transactional
     public void delete(@PathVariable("email") String email) {
         userService.deleteByEmail(email);
