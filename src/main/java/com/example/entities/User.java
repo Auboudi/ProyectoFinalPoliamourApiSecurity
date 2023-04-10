@@ -50,7 +50,7 @@ public class User implements Serializable {
     @Size(min = 4, max = 25, message = "Los apellidos debe contener entre 4 y 25 caracteres")
     private String surnames;
 
-    // @NotEmpty(message = "El campo <correo> no puede estar vacío")
+    @NotEmpty(message = "El campo <correo> no puede estar vacío")
     @Size(min = 4, max = 25, message = "El correo debe contener entre 4 y 25 caracteres")
     @Column(unique = true)
     private String email;
