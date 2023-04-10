@@ -31,9 +31,9 @@ build/
 
 ### VS Code ###
 .vscode/
-#*.properties
+*.properties
 
 
 
 ### Añadir el application properties ###
-# */properties
+*/properties
