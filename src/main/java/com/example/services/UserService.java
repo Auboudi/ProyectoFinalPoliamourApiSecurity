@@ -15,5 +15,11 @@ public interface UserService {
     public User save (User user);
     public void delete (User user); 
     
+    //service security
     
+    User add(User user);
+    List<User> findAll();
+    void deleteByEmail(String email);
+    User findByEmail(String email);
+    User update(User user);
 }
