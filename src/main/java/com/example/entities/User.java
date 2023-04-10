@@ -7,7 +7,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -49,6 +52,7 @@ public class User implements Serializable {
 
     @NotEmpty(message = "El campo <correo> no puede estar vacío")
     @Size(min = 4, max = 25, message = "El correo debe contener entre 4 y 25 caracteres")
+    @Column(unique = true)
     private String email;
 
     @NotEmpty(message = "El campo <contraseña> no puede estar vacío")
@@ -62,6 +66,13 @@ public class User implements Serializable {
     private String phone;
 
     private String imageUser;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+    public enum Role {
+        ADMIN, USER;
+    }
 
     // 1. RELACION USER-DEPARTMENT
 
