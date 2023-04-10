@@ -70,9 +70,7 @@ public class User implements Serializable {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    public enum Role {
-        ADMIN, USER;
-    }
+ 
 
     // 1. RELACION USER-DEPARTMENT
 
@@ -98,3 +96,5 @@ public class User implements Serializable {
 
     
 }
+
+

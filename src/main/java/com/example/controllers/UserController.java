@@ -64,6 +64,7 @@ public class UserController {
     @Autowired
     private YardService yardService;
 
+//BUSQUEDA PARA ADMINS 
 
     @GetMapping("/all")
     public ResponseEntity<List<User>> findAll(@RequestParam(name = "page", required = false) Integer page,
@@ -385,6 +386,11 @@ public class UserController {
         userService.deleteByEmail(email);
     }
 
+
+
+    //BUSQUEDA PARA USERS 
+
+    
     // @PutMapping("/update")
     // @Transactional
     // public ResponseEntity<User> update(@RequestBody User user) {
