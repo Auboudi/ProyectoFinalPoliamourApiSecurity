@@ -69,35 +69,29 @@ public class UserController {
     @Autowired
     private ModelMapper modelMapper;
 
-    // BUSQUEDA PARA ADMINS
+    /* OPCIONES DE ADMINISTRACIÓN */
 
-    @GetMapping("/all")
+    /* 1.LISTADO PAGINADO */
+    @GetMapping("/admin/all")
     public ResponseEntity<List<User>> findAll(@RequestParam(name = "page", required = false) Integer page,
             @RequestParam(name = "size", required = false) Integer size) {
 
         ResponseEntity<List<User>> responseEntity = null;
-
         List<User> users = new ArrayList<>();
-
         Sort sortByName = Sort.by("name");
 
         if (page != null && size != null) {
-
             try {
                 Pageable pageable = PageRequest.of(page, size, sortByName);
                 Page<User> usersPaginados = userService.findAll(pageable);
                 users = usersPaginados.getContent();
                 responseEntity = new ResponseEntity<List<User>>(users, HttpStatus.OK);
-
             } catch (Exception e) {
                 responseEntity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
         } else {
-
             try {
-
                 users = userService.findAll(sortByName);
-
                 responseEntity = new ResponseEntity<List<User>>(users, HttpStatus.OK);
 
             } catch (Exception e) {
@@ -105,9 +99,107 @@ public class UserController {
             }
         }
         return responseEntity;
+    }
+
+    /* 2. BUSCAR USER CON TODOS LOS DATOS (ADMIN) */
+
+    /* 2.1. BUSCAR POR ID */
+
+    @GetMapping("admin/find/{id}")
+    public ResponseEntity<Map<String, Object>> findById(@PathVariable(name = "id") Integer id) {
+
+        ResponseEntity<Map<String, Object>> responseEntity = null;
+        Map<String, Object> responseAsMap = new HashMap<>();
+
+        try {
+            User user = userService.findbyId(id);
+            if (user != null) {
+                String successMessage = "Se ha encontrado el Usuario con id: " + id + " correctamente";
+                responseAsMap.put("mensaje", successMessage);
+                responseAsMap.put("user", user);
+                // responseAsMap.put("mascotas", cliente.getMascotas());
+                responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.OK);
+            } else {
+                String errorMessage = "No se ha encontrado el usuario con id: " + id;
+                responseAsMap.put("error", errorMessage);
+                responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.NOT_FOUND);
+            }
+
+        } catch (Exception e) {
+            String errorGrave = "Error grave";
+            responseAsMap.put("error", errorGrave);
+            responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return responseEntity;
+    }
+
+    /* 2.2. BUSCAR POR EMAIL */
+
+    @GetMapping("admin/find/{email}")
+    public User getByEmail(@PathVariable("email") String email) {
+        return userService.findByEmail(email);
+    }
+
+    /* 3. BORRAR USUARIOS (ADMIN) */
+
+    /* 3.1. BORRAR POR ID */
+    @DeleteMapping("admin/delete/{id}")
+    @Transactional
+    public ResponseEntity<String> delete(@PathVariable(name = "id") Integer id) {
+        ResponseEntity<String> responseEntity = null;
+
+        try {
+
+            User user = userService.findbyId(id);
+            if (user != null) {
+                userService.delete(user);
+                responseEntity = new ResponseEntity<String>("Usuario borrado exitosamente", HttpStatus.OK);
+            } else {
+                responseEntity = new ResponseEntity<String>("Usuario no encontrado", HttpStatus.NOT_FOUND);
+            }
+
+        } catch (DataAccessException e) {
+            e.getMostSpecificCause();
+            responseEntity = new ResponseEntity<String>("Error fatal", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return responseEntity;
 
     }
 
+    /* 3.2. BORRAR POR EMAIL */
+    @DeleteMapping("admin/delete/{email}")
+    @Transactional
+    public void delete(@PathVariable("email") String email) {
+        userService.deleteByEmail(email);
+    }
+
+    /* 4. DESCARGAR IMAGENES DEL USER- SOLO PARA ADMINS */
+    @GetMapping("admin/downloadFile/{fileCode}")
+    public ResponseEntity<?> downloadFile(@PathVariable(name = "fileCode") String fileCode) {
+
+        Resource resource = null;
+
+        try {
+            resource = fileDownloadUtil.getFileAsResource(fileCode);
+        } catch (IOException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+        if (resource == null) {
+            return new ResponseEntity<>("File not found ", HttpStatus.NOT_FOUND);
+        }
+        String contentType = "application/octet-stream";
+        String headerValue = "attachment; filename=\"" + resource.getFilename() + "\"";
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
+                .body(resource);
+
+    }
+
+    /* OPCIONES HABILITADAS PARA USERS */
+
+    /* 1. AÑADIR USUARIOS */
     @PostMapping(value = "/add", consumes = "multipart/form-data")
     @Transactional
     public ResponseEntity<Map<String, Object>> insert(@Valid @RequestPart(name = "user") User user,
@@ -115,23 +207,15 @@ public class UserController {
             @RequestPart(name = "fileUser", required = false) MultipartFile fileUser) throws IOException {
 
         Map<String, Object> responseAsMap = new HashMap<>();
-
         ResponseEntity<Map<String, Object>> responseEntity = null;
 
         if (result.hasErrors()) {
-
             List<String> errorMessages = new ArrayList<>();
-
             for (ObjectError error : result.getAllErrors()) {
-
                 errorMessages.add(error.getDefaultMessage());
-
             }
-
             responseAsMap.put("errores", errorMessages);
-
             responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.BAD_REQUEST);
-
             return responseEntity;
 
         }
@@ -147,86 +231,33 @@ public class UserController {
                     .size(fileUser.getSize())
                     .build();
 
-            // NOTA PARA EL GRUPO: Creo que debemos devolver la info y cuando implementemos
-            // el
-            // security poner una validación que solo pueda descargar la imagen el propio
-            // usuario.
-            // preguntaremos a Victor (no stress)
-
             responseAsMap.put("info de la imagen: ", fileUploadResponse);
         }
-
         User userDB = userService.add(user);
-
         try {
 
             if (userDB != null) {
-
                 String message = "El usuario se ha creado correctamente";
                 responseAsMap.put("mensaje", message);
                 responseAsMap.put("usuario", userDB);
                 responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.CREATED);
-
             } else {
-
                 String message = "El usuario no se ha creado correctamente";
-
                 responseAsMap.put("mensaje", message);
-
                 responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.BAD_REQUEST);
-
             }
 
         } catch (DataAccessException e) {
-
             String errorGrave = "Ha tenido lugar un error grave  y, la causa más problable puede ser: "
                     + e.getMostSpecificCause();
-
             responseAsMap.put("errorGrave", errorGrave);
-
             responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.INTERNAL_SERVER_ERROR);
-
         }
 
         return responseEntity;
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Map<String, Object>> findById(@PathVariable(name = "id") Integer id) {
-
-        ResponseEntity<Map<String, Object>> responseEntity = null;
-
-        Map<String, Object> responseAsMap = new HashMap<>();
-
-        try {
-
-            User user = userService.findbyId(id);
-
-            if (user != null) {
-                String successMessage = "Se ha encontrado el Usuario con id: " + id + " correctamente";
-                responseAsMap.put("mensaje", successMessage);
-                responseAsMap.put("user", user);
-                // responseAsMap.put("mascotas", cliente.getMascotas());
-                responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.OK);
-
-            } else {
-
-                String errorMessage = "No se ha encontrado el usuario con id: " + id;
-                responseAsMap.put("error", errorMessage);
-                responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.NOT_FOUND);
-
-            }
-
-        } catch (Exception e) {
-
-            String errorGrave = "Error grave";
-            responseAsMap.put("error", errorGrave);
-            responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.INTERNAL_SERVER_ERROR);
-
-        }
-
-        return responseEntity;
-    }
+    /* ACTUALIZAR USERS */
 
     @PutMapping("/update")
     @Transactional
@@ -269,7 +300,6 @@ public class UserController {
             responseAsMap.put("info de la imagen: ", fileUploadResponse);
         }
 
-        // user.setEmail(email);
         User userDB = userService.update(user);
 
         try {
@@ -320,80 +350,32 @@ public class UserController {
 
     }
 
-    @DeleteMapping("/{id}")
-    @Transactional
-    public ResponseEntity<String> delete(@PathVariable(name = "id") Integer id) {
-        ResponseEntity<String> responseEntity = null;
-
-        try {
-
-            User user = userService.findbyId(id);
-
-            if (user != null) {
-
-                userService.delete(user);
-                responseEntity = new ResponseEntity<String>("Usuario borrado exitosamente", HttpStatus.OK);
-            } else {
-
-                responseEntity = new ResponseEntity<String>("Usuario no encontrado", HttpStatus.NOT_FOUND);
-            }
-
-        } catch (DataAccessException e) {
-            e.getMostSpecificCause();
-            responseEntity = new ResponseEntity<String>("Error fatal", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-        return responseEntity;
-
-    }
-
     // NOTA PARA EL GRUPO:
     // Lo dicho antes, preguntamos a Victor si podemos hacer que
     // solo lo pueda descargar el usuario que la ha subido
-    @GetMapping("/downloadFile/{fileCode}")
-    public ResponseEntity<?> downloadFile(@PathVariable(name = "fileCode") String fileCode) {
-
-        Resource resource = null;
-
-        try {
-            resource = fileDownloadUtil.getFileAsResource(fileCode);
-        } catch (IOException e) {
-            return ResponseEntity.internalServerError().build();
-        }
-
-        if (resource == null) {
-            return new ResponseEntity<>("File not found ", HttpStatus.NOT_FOUND);
-        }
-
-        String contentType = "application/octet-stream";
-        String headerValue = "attachment; filename=\"" + resource.getFilename() + "\"";
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
-                .body(resource);
-
-    }
-
-    @GetMapping("/email/{email}")
-    public User getByEmail(@PathVariable("email") String email) {
-        return userService.findByEmail(email);
-    }
-
-    @DeleteMapping("/email/{email}")
-    @Transactional
-    public void delete(@PathVariable("email") String email) {
-        userService.deleteByEmail(email);
-    }
 
     // BUSQUEDA PARA USERS
 
-    // GETALL
+    /* 1. LISTADO USER */
 
-    @GetMapping("/usersAll")
+    @GetMapping("/all")
     public List<UserDto> findAll() {
         return userService.findAll().stream().map(p -> modelMapper.map(p, UserDto.class))
                 .collect(Collectors.toList());
     }
 
+    /* 2. BUSCAR USUARIOS */
+
+    /*2.1. BUSCAR POR EMAIL */
+    @GetMapping("/find/{email}")
+    public ResponseEntity<UserDto> findByEmail(@PathVariable(name = "email") String email) {
+
+        User userNormal = userService.findByEmail(email);
+
+        UserDto userDtoEmail = modelMapper.map(userNormal, UserDto.class);
+
+        return ResponseEntity.ok().body(userDtoEmail);
+    }
+
+    
 }
