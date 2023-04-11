@@ -15,9 +15,9 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private static final String[] SECURED_URLs = {"/users/all"};
+    private static final String[] SECURED_URLs = {"/users/all", "/posts/All"};
 
-    private static final String[] UN_SECURED_URLs = {"/users/usersAll"};    
+    private static final String[] UN_SECURED_URLs = {"/users/usersAll", "posts/postsAll"};    
 
 
     @Bean
