@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessException;
@@ -45,7 +46,8 @@ import jakarta.validation.Valid;
 @RequestMapping("/posts")
 
 public class PostController {
-
+    @Autowired
+    private ModelMapper modelMapper;
     @Autowired
     private PostService postService;
 
@@ -58,16 +60,15 @@ public class PostController {
     @Autowired
     private UserService userService;
 
-    
-//METODO FINDALL 
+    // METODO FINDALL
 
-    @GetMapping
+    @GetMapping("/All")
     public ResponseEntity<List<Post>> findAll(@RequestParam(name = "page", required = false) Integer page,
             @RequestParam(name = "size", required = false) Integer size) {
 
         ResponseEntity<List<Post>> responseEntity = null;
 
-        List<Post> posts= new ArrayList<>();
+        List<Post> posts = new ArrayList<>();
 
         Sort sortById = Sort.by("id");
 
@@ -76,7 +77,7 @@ public class PostController {
             try {
                 Pageable pageable = PageRequest.of(page, size, sortById);
                 Page<Post> postsPaginados = postService.findAll(pageable);
-                posts= postsPaginados.getContent();
+                posts = postsPaginados.getContent();
                 responseEntity = new ResponseEntity<List<Post>>(posts, HttpStatus.OK);
 
             } catch (Exception e) {
@@ -98,14 +99,12 @@ public class PostController {
 
     }
 
-
-    //IMAGENES Y CREADO
+    // IMAGENES Y CREADO
     @PostMapping(consumes = "multipart/form-data")
     @Transactional
-    public ResponseEntity<Map<String, Object>> insert(@Valid 
-                @RequestPart(name = "post") Post post, 
-                BindingResult result,
-                @RequestPart(name = "filePost", required = false) MultipartFile filePost) throws IOException {
+    public ResponseEntity<Map<String, Object>> insert(@Valid @RequestPart(name = "post") Post post,
+            BindingResult result,
+            @RequestPart(name = "filePost", required = false) MultipartFile filePost) throws IOException {
 
         Map<String, Object> responseAsMap = new HashMap<>();
 
@@ -129,18 +128,16 @@ public class PostController {
 
         }
 
-        if(!filePost.isEmpty()) {
+        if (!filePost.isEmpty()) {
             String fileCode = fileUploadUtil.saveFile(filePost.getOriginalFilename(), filePost);
             post.setImagePost(fileCode + "-" + filePost.getOriginalFilename());
 
             FileUploadResponse fileUploadResponse = FileUploadResponse
-                        .builder()
-                        .fileName(fileCode + "-" + filePost.getOriginalFilename())
-                        .downloadURI("/posts/downloadFile/" + fileCode + "-" + filePost.getOriginalFilename())
-                        .size(filePost.getSize())
-                        .build();
-
-    
+                    .builder()
+                    .fileName(fileCode + "-" + filePost.getOriginalFilename())
+                    .downloadURI("/posts/downloadFile/" + fileCode + "-" + filePost.getOriginalFilename())
+                    .size(filePost.getSize())
+                    .build();
 
             responseAsMap.put("info de la imagen: ", fileUploadResponse);
         }
@@ -180,8 +177,7 @@ public class PostController {
         return responseEntity;
     }
 
-
-    //BUSCAR POR ID USER -> BETTER SI LO PONEMOS POR NOMBRE 
+    // BUSCAR POR ID USER -> BETTER SI LO PONEMOS POR NOMBRE
     @GetMapping("/{id}")
     public ResponseEntity<Map<String, Object>> findByUserId(@PathVariable(name = "id") Integer id) {
 
@@ -217,17 +213,17 @@ public class PostController {
         }
 
         return responseEntity;
-    }    
+    }
 
-    //ACTUALIZACION = RESOLVER PERMISOS 
+    // ACTUALIZACION = RESOLVER PERMISOS
 
     @PutMapping("/{id}")
     @Transactional
     public ResponseEntity<Map<String, Object>> update(
             @Valid @RequestPart(name = "post") Post post,
-            BindingResult result, 
+            BindingResult result,
             @RequestPart(name = "filePost", required = false) MultipartFile filePost,
-         
+
             @RequestPart(name = "user", required = false) User user,
 
             @PathVariable(name = "id") Integer id) throws IOException {
@@ -249,16 +245,16 @@ public class PostController {
             return responseEntity;
         }
 
-        if(!filePost.isEmpty()) {
+        if (!filePost.isEmpty()) {
             String fileCode = fileUploadUtil.saveFile(filePost.getOriginalFilename(), filePost);
             post.setImagePost(fileCode + "-" + filePost.getOriginalFilename());
 
             FileUploadResponse fileUploadResponse = FileUploadResponse
-                        .builder()
-                        .fileName(fileCode + "-" + filePost.getOriginalFilename())
-                        .downloadURI("/posts/downloadFile/" + fileCode + "-" + filePost.getOriginalFilename())
-                        .size(filePost.getSize())
-                        .build();
+                    .builder()
+                    .fileName(fileCode + "-" + filePost.getOriginalFilename())
+                    .downloadURI("/posts/downloadFile/" + fileCode + "-" + filePost.getOriginalFilename())
+                    .size(filePost.getSize())
+                    .build();
 
             responseAsMap.put("info de la imagen: ", fileUploadResponse);
         }
@@ -266,19 +262,15 @@ public class PostController {
         post.setId(id);
         Post postDB = postService.save(post);
 
-        
         try {
 
             if (postDB != null) {
 
+                if (user != null) {
 
-                if(user!= null) {
-
-                        userService.save(user);
-                        postDB.setUser(user);
-                    }
-
-              
+                    userService.save(user);
+                    postDB.setUser(user);
+                }
 
                 String message = "El post se ha actualizado correctamente";
                 responseAsMap.put("mensaje", message);
@@ -292,7 +284,7 @@ public class PostController {
                 responseAsMap.put("mensaje", errorMensaje);
 
                 responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap,
-                        HttpStatus.INTERNAL_SERVER_ERROR);               
+                        HttpStatus.INTERNAL_SERVER_ERROR);
 
             }
 
@@ -306,7 +298,7 @@ public class PostController {
 
     }
 
-    //BORRADO
+    // BORRADO
 
     @DeleteMapping("/{id}")
     @Transactional
@@ -318,11 +310,11 @@ public class PostController {
             Post post = postService.findbyId(id);
 
             if (post != null) {
-   
+
                 postService.delete(post);
                 responseEntity = new ResponseEntity<String>("Post borrado exitosamente", HttpStatus.OK);
             } else {
-  
+
                 responseEntity = new ResponseEntity<String>("Post no encontrado", HttpStatus.NOT_FOUND);
             }
 
@@ -333,12 +325,9 @@ public class PostController {
 
         return responseEntity;
 
-        
-
     }
 
-    
-    //ESTO NO ES NECESARIO 
+    // ESTO NO ES NECESARIO
     @GetMapping("/downloadFile/{fileCode}")
     public ResponseEntity<?> downloadFile(@PathVariable(name = "fileCode") String fileCode) {
 
@@ -358,13 +347,17 @@ public class PostController {
         String headerValue = "attachment; filename=\"" + resource.getFilename() + "\"";
 
         return ResponseEntity.ok()
-        .contentType(MediaType.parseMediaType(contentType))
-        .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
-        .body(resource);
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
+                .body(resource);
 
-    }  
+    }
 
-
+    /// POST PARA USERS
+    // @GetMapping("/postsAll")
+    // public List<PostDto> findAll() {
+    // return postService.findAll().stream().map(p -> modelMapper.map(p,
+    // PostDto.class))
+    // .collect(Collectors.);
+    // }
 }
-    
-

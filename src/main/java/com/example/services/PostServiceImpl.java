@@ -50,6 +50,11 @@ public class PostServiceImpl implements PostService {
         return postDao.findByUserId(id);
     }
 
+    @Override
+    public List<Post> findAll() {
+        return postDao.findAll();
+    }
+
     
 
 
