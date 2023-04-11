@@ -16,11 +16,9 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private static final String[] SECURED_URLs = {"/users/**"};
-    private static final String[] SECURED_URLs = {"/users/**"};
+    
 
-    private static final String[] UN_SECURED_URLs = {
-            "/posts/**"
-    };    
+    private static final String[] UN_SECURED_URLs = {"/posts/**"};    
 
 
     @Bean
