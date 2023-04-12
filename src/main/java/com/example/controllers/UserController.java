@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -68,6 +70,24 @@ public class UserController {
 
     @Autowired
     private ModelMapper modelMapper;
+
+
+    /*UTILIDADES */
+
+    // Método validación email
+    public static bool IsValidEmail(string email){
+    Matcher matcher = pattern.matcher(user.getEmail());
+ 
+    if (matcher.find() == false) {
+        String mensajeError = "Sólo puede usar un correo @poliamor.";
+    responseAsMap.put("error", mensajeError);
+    return new ResponseEntity<>(responseAsMap, HttpStatus.BAD_REQUEST);
+    } 
+
+    Pattern pattern = Pattern
+     .compile("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@poliamor.com");}
+     
+
 
     /* OPCIONES DE ADMINISTRACIÓN */
 
@@ -137,7 +157,7 @@ public class UserController {
     /* 2.2. BUSCAR POR EMAIL */
 
     @GetMapping("admin/find/email/{email}")
-    public ResponseEntity <Map<String, Object>> getByEmail(@PathVariable("email") String email) {
+    public ResponseEntity<Map<String, Object>> getByEmail(@PathVariable("email") String email) {
 
         ResponseEntity<Map<String, Object>> responseEntity = null;
         Map<String, Object> responseAsMap = new HashMap<>();
@@ -213,10 +233,9 @@ public class UserController {
         }
         return responseEntity;
 
-    
     }
 
-    /*4. ACTUALIZAR USERS (CUALQUIER USER/TODOS LOS CAMPOS) */
+    /* 4. ACTUALIZAR USERS (CUALQUIER USER/TODOS LOS CAMPOS) */
     @PutMapping("/admin/update")
     @Transactional
     public ResponseEntity<Map<String, Object>> update(
@@ -230,7 +249,11 @@ public class UserController {
         Map<String, Object> responseAsMap = new HashMap<>();
         ResponseEntity<Map<String, Object>> responseEntity = null;
 
+      
+
+      
         if (result.hasErrors()) {
+
 
             List<String> errorMessages = new ArrayList<>();
 
@@ -342,8 +365,6 @@ public class UserController {
         Map<String, Object> responseAsMap = new HashMap<>();
         ResponseEntity<Map<String, Object>> responseEntity = null;
 
-       
-
         if (result.hasErrors()) {
             List<String> errorMessages = new ArrayList<>();
             for (ObjectError error : result.getAllErrors()) {
@@ -401,31 +422,31 @@ public class UserController {
     /* 1. LISTADO USER */
 
     @GetMapping("/all")
-    public ResponseEntity <List<UserDto>> findAllUsers() {
-        List <UserDto> listaUsuarios = userService.findAll().stream().map(p -> modelMapper.map(p, UserDto.class))
+    public ResponseEntity<List<UserDto>> findAllUsers() {
+        List<UserDto> listaUsuarios = userService.findAll().stream().map(p -> modelMapper.map(p, UserDto.class))
                 .collect(Collectors.toList());
-                return new ResponseEntity<>(listaUsuarios, HttpStatus.OK);  
+        return new ResponseEntity<>(listaUsuarios, HttpStatus.OK);
     }
 
     /* 2. BUSCAR USUARIOS */
 
-    /*2.1. BUSCAR POR EMAIL */
+    /* 2.1. BUSCAR POR EMAIL */
     @GetMapping("/find/{email}")
     public ResponseEntity<UserDto> findByEmail(@PathVariable(name = "email") String email) {
 
         User userNormal = userService.findByEmail(email);
         UserDto userDtoEmail = modelMapper.map(userNormal, UserDto.class);
-        return new ResponseEntity<>(userDtoEmail, HttpStatus.OK);  
+        return new ResponseEntity<>(userDtoEmail, HttpStatus.OK);
     }
 
-    /*3. UPDATE USER */
+    /* 3. UPDATE USER */
 
     @PutMapping("/updateUser/{currentUserEmail}")
     @Transactional
     public ResponseEntity<Map<String, Object>> update(
             @Valid @RequestPart(name = "user") User user,
             BindingResult result,
-            @PathVariable(name = "currentUserEmail")  String currentUserEmail, 
+            @PathVariable(name = "currentUserEmail") String currentUserEmail,
             @RequestPart(name = "fileUser", required = false) MultipartFile fileUser)
             // ,
             // @RequestPart(name = "email", required = false) String email)
@@ -434,13 +455,13 @@ public class UserController {
         Map<String, Object> responseAsMap = new HashMap<>();
         ResponseEntity<Map<String, Object>> responseEntity = null;
 
-if (!currentUserEmail.equals(user.getEmail())){
+        if (!currentUserEmail.equals(user.getEmail())) {
 
-    String mensajeError = "Sólo puede actualizar su perfil"; 
-    responseAsMap.put("error",mensajeError); 
-    return new ResponseEntity<>(responseAsMap, HttpStatus.BAD_REQUEST); 
-    
-}
+            String mensajeError = "Sólo puede actualizar su perfil";
+            responseAsMap.put("error", mensajeError);
+            return new ResponseEntity<>(responseAsMap, HttpStatus.BAD_REQUEST);
+
+        }
         if (result.hasErrors()) {
 
             List<String> errorMessages = new ArrayList<>();
@@ -519,17 +540,19 @@ if (!currentUserEmail.equals(user.getEmail())){
     }
 
     /** */
-//     @GetMapping("/allHobbies")
-     
-//      public ResponseEntity <Map<String, List<UserDto>>> listaHobbies() {
-//          userService.findAll().stream().map(p -> modelMapper.map(p, UserDto.class))
-//     .collect(Collectors.toList());
+    // @GetMapping("/allHobbies")
 
-// Map<String, List<UserDto>> usuariosPorHobbie = new HashMap<>(); 
-// List<UserDto> usuariosDto = userService.findAll().stream().map(p -> modelMapper.map(p, UserDto.class))
-// .collect(Collectors.toList());
-//  usuariosPorHobbie = usuariosDto.stream().collect(Collectors.groupingBy(p -> p.getHobbie())); 
- 
-//  return new ResponseEntity<>(usuariosPorHobbie, HttpStatus.OK);
-    
+    // public ResponseEntity <Map<String, List<UserDto>>> listaHobbies() {
+    // userService.findAll().stream().map(p -> modelMapper.map(p, UserDto.class))
+    // .collect(Collectors.toList());
+
+    // Map<String, List<UserDto>> usuariosPorHobbie = new HashMap<>();
+    // List<UserDto> usuariosDto = userService.findAll().stream().map(p ->
+    // modelMapper.map(p, UserDto.class))
+    // .collect(Collectors.toList());
+    // usuariosPorHobbie = usuariosDto.stream().collect(Collectors.groupingBy(p ->
+    // p.getHobbie()));
+
+    // return new ResponseEntity<>(usuariosPorHobbie, HttpStatus.OK);
+
 }
