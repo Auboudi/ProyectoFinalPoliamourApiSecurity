@@ -2,6 +2,7 @@ package com.example.repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -115,9 +116,6 @@ public class UserRepositoryTests {
         assertThat(userAdd).isNotNull();
         assertThat(userAdd.getId()).isGreaterThan(0L);
 
-
-
-
     }
 
     @DisplayName("Test para listar usuarios")
@@ -157,7 +155,7 @@ public class UserRepositoryTests {
     
     departmentDao.save(dpto0);
     yardDao.save(yard0);
-    
+
     userRepository.save(user0);
     userRepository.save(user1);
 
@@ -230,8 +228,22 @@ public class UserRepositoryTests {
     @Test
     public void testDeleteUser() {
 
+        // Given
+
         departmentDao.save(dpto0);
         yardDao.save(yard0);
+
+        userRepository.save(user0);
+
+        // When 
+
+        userRepository.delete(user0);
+        Optional<User> optionalUser = userRepository.findByEmail(user0.getEmail());
+
+        // Then 
+
+        assertThat(optionalUser).isEmpty();
+
 
 
     }
