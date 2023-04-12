@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 
 public class PostDto implements Serializable {
+    
     private long id;
     private String text;
     private String imagePost;

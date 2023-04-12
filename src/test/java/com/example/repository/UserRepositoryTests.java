@@ -157,7 +157,7 @@ public class UserRepositoryTests {
     
     departmentDao.save(dpto0);
     yardDao.save(yard0);
-
+    
     userRepository.save(user0);
     userRepository.save(user1);
 
@@ -183,7 +183,7 @@ public class UserRepositoryTests {
         // Given
 
         departmentDao.save(dpto0);
-        yardDao.save(yard0);
+
 
         userRepository.save(user0);
 
@@ -205,7 +205,6 @@ public class UserRepositoryTests {
         // Given
 
         departmentDao.save(dpto0);
-        yardDao.save(yard0);
         userRepository.save(user0);
 
         // When
@@ -226,6 +225,18 @@ public class UserRepositoryTests {
 
 
     }
+
+    @DisplayName("Test para eliminar un user")
+    @Test
+    public void testDeleteUser() {
+
+        departmentDao.save(dpto0);
+        yardDao.save(yard0);
+
+
+    }
+
+
 
 
 
