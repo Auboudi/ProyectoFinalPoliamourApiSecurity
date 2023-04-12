@@ -359,9 +359,10 @@ public class UserController {
     /* 1. LISTADO USER */
 
     @GetMapping("/all")
-    public List<UserDto> findAll() {
-        return userService.findAll().stream().map(p -> modelMapper.map(p, UserDto.class))
+    public ResponseEntity <List<UserDto>> findAllUsers() {
+        List <UserDto> listaUsuarios = userService.findAll().stream().map(p -> modelMapper.map(p, UserDto.class))
                 .collect(Collectors.toList());
+                return new ResponseEntity<>(listaUsuarios, HttpStatus.OK);  
     }
 
     /* 2. BUSCAR USUARIOS */
@@ -371,11 +372,22 @@ public class UserController {
     public ResponseEntity<UserDto> findByEmail(@PathVariable(name = "email") String email) {
 
         User userNormal = userService.findByEmail(email);
-
         UserDto userDtoEmail = modelMapper.map(userNormal, UserDto.class);
-
-        return ResponseEntity.ok().body(userDtoEmail);
+        return new ResponseEntity<>(userDtoEmail, HttpStatus.OK);  
     }
 
+    /** */
+//     @GetMapping("/allHobbies")
+     
+//      public ResponseEntity <Map<String, List<UserDto>>> listaHobbies() {
+//          userService.findAll().stream().map(p -> modelMapper.map(p, UserDto.class))
+//     .collect(Collectors.toList());
+
+// Map<String, List<UserDto>> usuariosPorHobbie = new HashMap<>(); 
+// List<UserDto> usuariosDto = userService.findAll().stream().map(p -> modelMapper.map(p, UserDto.class))
+// .collect(Collectors.toList());
+//  usuariosPorHobbie = usuariosDto.stream().collect(Collectors.groupingBy(p -> p.getHobbie())); 
+ 
+//  return new ResponseEntity<>(usuariosPorHobbie, HttpStatus.OK);
     
 }
