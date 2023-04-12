@@ -51,7 +51,6 @@ public class UserControllerTests {
     @MockBean
     private UserService userService;
 
-    private DepartmentDao departmentDao;
 
     @Autowired
     private ObjectMapper objectMapper;

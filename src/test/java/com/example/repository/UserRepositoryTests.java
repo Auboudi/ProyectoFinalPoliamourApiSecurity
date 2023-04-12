@@ -166,7 +166,7 @@ public class UserRepositoryTests {
     // Then 
 
     assertThat(usuarios).isNotNull();
-    assertThat(usuarios).size().isEqualTo(7);
+    assertThat(usuarios).size().isEqualTo(9);
 
 
 
