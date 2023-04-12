@@ -233,6 +233,7 @@ public class UserController {
 
             responseAsMap.put("info de la imagen: ", fileUploadResponse);
         }
+
         User userDB = userService.add(user);
         try {
 
@@ -350,10 +351,6 @@ public class UserController {
 
     }
 
-    // NOTA PARA EL GRUPO:
-    // Lo dicho antes, preguntamos a Victor si podemos hacer que
-    // solo lo pueda descargar el usuario que la ha subido
-
     // BUSQUEDA PARA USERS
 
     /* 1. LISTADO USER */
@@ -366,7 +363,7 @@ public class UserController {
 
     /* 2. BUSCAR USUARIOS */
 
-    /*2.1. BUSCAR POR EMAIL */
+    /* 2.1. BUSCAR POR EMAIL */
     @GetMapping("/find/{email}")
     public ResponseEntity<UserDto> findByEmail(@PathVariable(name = "email") String email) {
 
@@ -377,5 +374,4 @@ public class UserController {
         return ResponseEntity.ok().body(userDtoEmail);
     }
 
-    
 }
