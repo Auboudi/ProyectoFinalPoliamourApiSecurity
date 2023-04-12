@@ -381,7 +381,6 @@ public class UserController {
             return responseEntity;
 
         }
-
         if (!fileUser.isEmpty()) {
             String fileCode = fileUploadUtil.saveFile(fileUser.getOriginalFilename(), fileUser);
             user.setImageUser(fileCode + "-" + fileUser.getOriginalFilename());
@@ -397,7 +396,6 @@ public class UserController {
         }
         User userDB = userService.add(user);
         try {
-
             if (userDB != null) {
                 String message = "El usuario se ha creado correctamente";
                 responseAsMap.put("mensaje", message);
@@ -415,13 +413,10 @@ public class UserController {
             responseAsMap.put("errorGrave", errorGrave);
             responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
         return responseEntity;
     }
 
-    // NOTA PARA EL GRUPO:
-    // Lo dicho antes, preguntamos a Victor si podemos hacer que
-    // solo lo pueda descargar el usuario que la ha subido
+  
 
     // BUSQUEDA PARA USERS
 
@@ -445,6 +440,7 @@ public class UserController {
         UserDto userDtoEmail = modelMapper.map(userNormal, UserDto.class);
         return new ResponseEntity<>(userDtoEmail, HttpStatus.OK);
     }
+
 
     /* 3. UPDATE USER */
 
@@ -470,22 +466,17 @@ public class UserController {
         }
 
         if (!currentUserEmail.equals(user.getEmail())) {
-
             String mensajeError = "Sólo puede actualizar su perfil";
             responseAsMap.put("error", mensajeError);
             return new ResponseEntity<>(responseAsMap, HttpStatus.BAD_REQUEST);
 
         }
         if (result.hasErrors()) {
-
             List<String> errorMessages = new ArrayList<>();
-
             for (ObjectError error : result.getAllErrors()) {
                 errorMessages.add(error.getDefaultMessage());
             }
-
             responseAsMap.put("errores", errorMessages);
-
             responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.BAD_REQUEST);
             return responseEntity;
         }
@@ -493,80 +484,69 @@ public class UserController {
         if (!fileUser.isEmpty()) {
             String fileCode = fileUploadUtil.saveFile(fileUser.getOriginalFilename(), fileUser);
             user.setImageUser(fileCode + "-" + fileUser.getOriginalFilename());
-
             FileUploadResponse fileUploadResponse = FileUploadResponse
                     .builder()
                     .fileName(fileCode + "-" + fileUser.getOriginalFilename())
                     .downloadURI("/users/downloadFile/" + fileCode + "-" + fileUser.getOriginalFilename())
                     .size(fileUser.getSize())
                     .build();
-
             responseAsMap.put("info de la imagen: ", fileUploadResponse);
         }
 
         User userDB = userService.update(user);
 
         try {
-
             if (userDB != null) {
-
                 Department department = userDB.getDepartment();
                 List<Yard> yards = userDB.getYards();
 
                 if (department != null) {
-
                     departmentService.save(department);
                     userDB.setDepartment(department);
                 }
 
                 if (yards.size() != 0) {
-
                     for (Yard yard : yards) {
                         yardService.save(yard);
                     }
                     userDB.setYards(yards);
                 }
-
                 String message = "El usuario se ha actualizado correctamente";
                 responseAsMap.put("mensaje", message);
                 responseAsMap.put("usuario", userDB);
                 responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.CREATED);
 
             } else {
-
                 String errorMensaje = "El usuario no se ha actualizado correctamente";
-
                 responseAsMap.put("mensaje", errorMensaje);
-
                 responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap,
                         HttpStatus.INTERNAL_SERVER_ERROR);
 
             }
-
         } catch (DataAccessException e) {
             String errorGrave = "Se ha producido un error grave y la causa puede ser " + e.getMostSpecificCause();
             responseAsMap.put("errorGrave", errorGrave);
             responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
         return responseEntity;
-
     }
 
-    /** */
-    // @GetMapping("/allHobbies")
+ /*4. ORDENAR POR GRUPOS */
 
-    // public ResponseEntity <Map<String, List<UserDto>>> listaHobbies() {
-    // userService.findAll().stream().map(p -> modelMapper.map(p, UserDto.class))
-    // .collect(Collectors.toList());
+ //ORDENADO POR YARD
+//  @GetMapping("/yards")
 
-    // Map<String, List<UserDto>> usuariosPorHobbie = new HashMap<>();
-    // List<UserDto> usuariosDto = userService.findAll().stream().map(p ->
-    // modelMapper.map(p, UserDto.class))
-    // .collect(Collectors.toList());
-    // usuariosPorHobbie = usuariosDto.stream().collect(Collectors.groupingBy(p ->
-    // p.getHobbie()));
+//  public ResponseEntity <Map <Object, List<UserDto>>> listaYards() {
+//  Map<Object, List<UserDto>> usuariosPorYards = new HashMap<>();
+//  List<UserDto> usuariosDto = userService.findAll().stream().map(p ->
+//  modelMapper.map(p, UserDto.class))
+//  .collect(Collectors.toList());
+//   usuariosPorYards = usuariosDto.stream().collect(Collectors.groupingBy(p ->
+//  p.getYards()));
 
-    // return new ResponseEntity<>(usuariosPorHobbie, HttpStatus.OK);
+//   return new ResponseEntity<>(usuariosPorYards, HttpStatus.OK);
 
+// }
+
+    
 }
