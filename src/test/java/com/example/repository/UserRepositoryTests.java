@@ -1,4 +1,4 @@
-package com.example.services;
+package com.example.repository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,21 +10,33 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.context.SpringBootTest;
 
+import com.example.dao.DepartmentDao;
+import com.example.dao.YardDao;
 import com.example.entities.Department;
 
 import com.example.entities.Role;
 import com.example.entities.User;
 import com.example.entities.Yard;
+import com.example.services.UserRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataJpaTest
+@SpringBootTest
+//@DataJpaTest
 @AutoConfigureTestDatabase(replace = Replace.NONE)
 public class UserRepositoryTests {
     
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private DepartmentDao departmentDao;
+
+    @Autowired
+    private YardDao yardDao;
+
 
     private User user0;
 
@@ -53,7 +65,9 @@ public class UserRepositoryTests {
             .name("Test User0")
             .surnames("Test User 0")
             .email("correoTest0@gmail.com")
+            .password("password")
             .department(dpto0)
+            .city("Murcia")
             .yards(yards0)
             .role(Role.USER)
             .build();
@@ -71,9 +85,13 @@ public class UserRepositoryTests {
             .name("Dpto1")
             .build();
 
+        departmentDao.save(dpto1);
+
         Yard yard1 = Yard.builder()
             .name("Yard0")
             .build();
+        
+            yardDao.save(yard1);
 
         List<Yard> yards1 = new ArrayList<>();
 
@@ -85,7 +103,9 @@ public class UserRepositoryTests {
             .name("Test User1")
             .surnames("Test User 1")
             .email("correoTest10@gmail.com")
+            .password("password")
             .department(dpto1)
+            .city("Murcia")
             .yards(yards1)
             .role(Role.USER)
             .build();
