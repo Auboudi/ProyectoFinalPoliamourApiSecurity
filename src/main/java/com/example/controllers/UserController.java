@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -42,6 +44,7 @@ import com.example.services.UserService;
 import com.example.services.YardService;
 import com.example.utilities.FileDownloadUtil;
 import com.example.utilities.FileUploadUtil;
+import com.fasterxml.jackson.databind.deser.DataFormatReaders.Match;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -68,6 +71,20 @@ public class UserController {
 
     @Autowired
     private ModelMapper modelMapper;
+
+    /* UTILIDADES */
+
+    // Método validación email
+    public static boolean IsValidEmail(User user) {
+        Pattern pattern = Pattern
+                .compile("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@poliamor.com");
+        Matcher matcher = pattern.matcher(user.getEmail());
+        if (matcher.find() == true) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     /* OPCIONES DE ADMINISTRACIÓN */
 
@@ -105,7 +122,7 @@ public class UserController {
 
     /* 2.1. BUSCAR POR ID */
 
-    @GetMapping("admin/find/{id}")
+    @GetMapping("admin/find/id/{id}")
     public ResponseEntity<Map<String, Object>> findById(@PathVariable(name = "id") Integer id) {
 
         ResponseEntity<Map<String, Object>> responseEntity = null;
@@ -136,15 +153,39 @@ public class UserController {
 
     /* 2.2. BUSCAR POR EMAIL */
 
-    @GetMapping("admin/find/{email}")
-    public User getByEmail(@PathVariable("email") String email) {
-        return userService.findByEmail(email);
+    @GetMapping("admin/find/email/{email}")
+    public ResponseEntity<Map<String, Object>> getByEmail(@PathVariable("email") String email) {
+
+        ResponseEntity<Map<String, Object>> responseEntity = null;
+        Map<String, Object> responseAsMap = new HashMap<>();
+
+        try {
+            User user = userService.findByEmail(email);
+            if (user != null) {
+                String successMessage = "Se ha encontrado el Usuario con email: " + email + " correctamente";
+                responseAsMap.put("mensaje", successMessage);
+                responseAsMap.put("user", user);
+                // responseAsMap.put("mascotas", cliente.getMascotas());
+                responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.OK);
+            } else {
+                String errorMessage = "No se ha encontrado el usuario con email: " + email;
+                responseAsMap.put("error", errorMessage);
+                responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.NOT_FOUND);
+            }
+
+        } catch (Exception e) {
+            String errorGrave = "Error grave";
+            responseAsMap.put("error", errorGrave);
+            responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return responseEntity;
     }
 
     /* 3. BORRAR USUARIOS (ADMIN) */
 
     /* 3.1. BORRAR POR ID */
-    @DeleteMapping("admin/delete/{id}")
+    @DeleteMapping("admin/delete/id/{id}")
     @Transactional
     public ResponseEntity<String> delete(@PathVariable(name = "id") Integer id) {
         ResponseEntity<String> responseEntity = null;
@@ -168,98 +209,31 @@ public class UserController {
     }
 
     /* 3.2. BORRAR POR EMAIL */
-    @DeleteMapping("admin/delete/{email}")
+    @DeleteMapping("admin/delete/email/{email}")
     @Transactional
-    public void delete(@PathVariable("email") String email) {
-        userService.deleteByEmail(email);
-    }
-
-    /* 4. DESCARGAR IMAGENES DEL USER- SOLO PARA ADMINS */
-    @GetMapping("admin/downloadFile/{fileCode}")
-    public ResponseEntity<?> downloadFile(@PathVariable(name = "fileCode") String fileCode) {
-
-        Resource resource = null;
+    public ResponseEntity<String> delete(@PathVariable("email") String email) {
+        ResponseEntity<String> responseEntity = null;
 
         try {
-            resource = fileDownloadUtil.getFileAsResource(fileCode);
-        } catch (IOException e) {
-            return ResponseEntity.internalServerError().build();
-        }
-        if (resource == null) {
-            return new ResponseEntity<>("File not found ", HttpStatus.NOT_FOUND);
-        }
-        String contentType = "application/octet-stream";
-        String headerValue = "attachment; filename=\"" + resource.getFilename() + "\"";
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
-                .body(resource);
 
-    }
-
-    /* OPCIONES HABILITADAS PARA USERS */
-
-    /* 1. AÑADIR USUARIOS */
-    @PostMapping(value = "/add", consumes = "multipart/form-data")
-    @Transactional
-    public ResponseEntity<Map<String, Object>> insert(@Valid @RequestPart(name = "user") User user,
-            BindingResult result,
-            @RequestPart(name = "fileUser", required = false) MultipartFile fileUser) throws IOException {
-
-        Map<String, Object> responseAsMap = new HashMap<>();
-        ResponseEntity<Map<String, Object>> responseEntity = null;
-
-        if (result.hasErrors()) {
-            List<String> errorMessages = new ArrayList<>();
-            for (ObjectError error : result.getAllErrors()) {
-                errorMessages.add(error.getDefaultMessage());
-            }
-            responseAsMap.put("errores", errorMessages);
-            responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.BAD_REQUEST);
-            return responseEntity;
-
-        }
-
-        if (!fileUser.isEmpty()) {
-            String fileCode = fileUploadUtil.saveFile(fileUser.getOriginalFilename(), fileUser);
-            user.setImageUser(fileCode + "-" + fileUser.getOriginalFilename());
-
-            FileUploadResponse fileUploadResponse = FileUploadResponse
-                    .builder()
-                    .fileName(fileCode + "-" + fileUser.getOriginalFilename())
-                    .downloadURI("/users/downloadFile/" + fileCode + "-" + fileUser.getOriginalFilename())
-                    .size(fileUser.getSize())
-                    .build();
-
-            responseAsMap.put("info de la imagen: ", fileUploadResponse);
-        }
-        User userDB = userService.add(user);
-        try {
-
-            if (userDB != null) {
-                String message = "El usuario se ha creado correctamente";
-                responseAsMap.put("mensaje", message);
-                responseAsMap.put("usuario", userDB);
-                responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.CREATED);
+            User user = userService.findByEmail(email);
+            if (user != null) {
+                userService.delete(user);
+                responseEntity = new ResponseEntity<String>("Usuario borrado exitosamente", HttpStatus.OK);
             } else {
-                String message = "El usuario no se ha creado correctamente";
-                responseAsMap.put("mensaje", message);
-                responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.BAD_REQUEST);
+                responseEntity = new ResponseEntity<String>("Usuario no encontrado", HttpStatus.NOT_FOUND);
             }
 
         } catch (DataAccessException e) {
-            String errorGrave = "Ha tenido lugar un error grave  y, la causa más problable puede ser: "
-                    + e.getMostSpecificCause();
-            responseAsMap.put("errorGrave", errorGrave);
-            responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.INTERNAL_SERVER_ERROR);
+            e.getMostSpecificCause();
+            responseEntity = new ResponseEntity<String>("Error fatal", HttpStatus.INTERNAL_SERVER_ERROR);
         }
-
         return responseEntity;
+
     }
 
-    /* ACTUALIZAR USERS */
-
-    @PutMapping("/update")
+    /* 4. ACTUALIZAR USERS (CUALQUIER USER/TODOS LOS CAMPOS) */
+    @PutMapping("/admin/update")
     @Transactional
     public ResponseEntity<Map<String, Object>> update(
             @Valid @RequestPart(name = "user") User user,
@@ -271,6 +245,13 @@ public class UserController {
 
         Map<String, Object> responseAsMap = new HashMap<>();
         ResponseEntity<Map<String, Object>> responseEntity = null;
+
+        // Validación email
+        if (IsValidEmail(user) == false) {
+            String mensajeError = "Sólo puede utilizar un email del dominio de la empresa";
+            responseAsMap.put("error", mensajeError);
+            return new ResponseEntity<>(responseAsMap, HttpStatus.BAD_REQUEST);
+        }
 
         if (result.hasErrors()) {
 
@@ -307,7 +288,6 @@ public class UserController {
             if (userDB != null) {
 
                 Department department = userDB.getDepartment();
-
                 List<Yard> yards = userDB.getYards();
 
                 if (department != null) {
@@ -350,44 +330,223 @@ public class UserController {
 
     }
 
-    // NOTA PARA EL GRUPO:
-    // Lo dicho antes, preguntamos a Victor si podemos hacer que
-    // solo lo pueda descargar el usuario que la ha subido
+    /* 4. DESCARGAR IMAGENES DEL USER- SOLO PARA ADMINS */
+    @GetMapping("admin/downloadFile/{fileCode}")
+    public ResponseEntity<?> downloadFile(@PathVariable(name = "fileCode") String fileCode) {
+
+        Resource resource = null;
+
+        try {
+            resource = fileDownloadUtil.getFileAsResource(fileCode);
+        } catch (IOException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+        if (resource == null) {
+            return new ResponseEntity<>("File not found ", HttpStatus.NOT_FOUND);
+        }
+        String contentType = "application/octet-stream";
+        String headerValue = "attachment; filename=\"" + resource.getFilename() + "\"";
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
+                .body(resource);
+
+    }
+
+    /* OPCIONES HABILITADAS PARA USERS */
+
+    /* 1. AÑADIR USUARIOS (HABILITADA PARA AMBOS) */
+    @PostMapping(value = "/add", consumes = "multipart/form-data")
+    @Transactional
+    public ResponseEntity<Map<String, Object>> insert(@Valid @RequestPart(name = "user") User user,
+            BindingResult result,
+            @RequestPart(name = "fileUser", required = false) MultipartFile fileUser) throws IOException {
+
+        Map<String, Object> responseAsMap = new HashMap<>();
+        ResponseEntity<Map<String, Object>> responseEntity = null;
+
+        // Validación email
+        if (IsValidEmail(user) == false) {
+            String mensajeError = "Sólo puede utilizar un email del dominio de la empresa";
+            responseAsMap.put("error", mensajeError);
+            return new ResponseEntity<>(responseAsMap, HttpStatus.BAD_REQUEST);
+        }
+        if (result.hasErrors()) {
+            List<String> errorMessages = new ArrayList<>();
+            for (ObjectError error : result.getAllErrors()) {
+                errorMessages.add(error.getDefaultMessage());
+            }
+            responseAsMap.put("errores", errorMessages);
+            responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.BAD_REQUEST);
+            return responseEntity;
+
+        }
+        if (!fileUser.isEmpty()) {
+            String fileCode = fileUploadUtil.saveFile(fileUser.getOriginalFilename(), fileUser);
+            user.setImageUser(fileCode + "-" + fileUser.getOriginalFilename());
+
+            FileUploadResponse fileUploadResponse = FileUploadResponse
+                    .builder()
+                    .fileName(fileCode + "-" + fileUser.getOriginalFilename())
+                    .downloadURI("/users/downloadFile/" + fileCode + "-" + fileUser.getOriginalFilename())
+                    .size(fileUser.getSize())
+                    .build();
+
+            responseAsMap.put("info de la imagen: ", fileUploadResponse);
+        }
+        User userDB = userService.add(user);
+        try {
+            if (userDB != null) {
+                String message = "El usuario se ha creado correctamente";
+                responseAsMap.put("mensaje", message);
+                responseAsMap.put("usuario", userDB);
+                responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.CREATED);
+            } else {
+                String message = "El usuario no se ha creado correctamente";
+                responseAsMap.put("mensaje", message);
+                responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.BAD_REQUEST);
+            }
+
+        } catch (DataAccessException e) {
+            String errorGrave = "Ha tenido lugar un error grave  y, la causa más problable puede ser: "
+                    + e.getMostSpecificCause();
+            responseAsMap.put("errorGrave", errorGrave);
+            responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return responseEntity;
+    }
+
+  
 
     // BUSQUEDA PARA USERS
 
     /* 1. LISTADO USER */
 
     @GetMapping("/all")
-    public ResponseEntity <List<UserDto>> findAllUsers() {
-        List <UserDto> listaUsuarios = userService.findAll().stream().map(p -> modelMapper.map(p, UserDto.class))
+    public ResponseEntity<List<UserDto>> findAllUsers() {
+        List<UserDto> listaUsuarios = userService.findAll().stream().map(p -> modelMapper.map(p, UserDto.class))
                 .collect(Collectors.toList());
-                return new ResponseEntity<>(listaUsuarios, HttpStatus.OK);  
+        return new ResponseEntity<>(listaUsuarios, HttpStatus.OK);
     }
 
     /* 2. BUSCAR USUARIOS */
 
-    /*2.1. BUSCAR POR EMAIL */
+    /* 2.1. BUSCAR POR EMAIL */
     @GetMapping("/find/{email}")
     public ResponseEntity<UserDto> findByEmail(@PathVariable(name = "email") String email) {
 
+
         User userNormal = userService.findByEmail(email);
         UserDto userDtoEmail = modelMapper.map(userNormal, UserDto.class);
-        return new ResponseEntity<>(userDtoEmail, HttpStatus.OK);  
+        return new ResponseEntity<>(userDtoEmail, HttpStatus.OK);
     }
 
-    /** */
-//     @GetMapping("/allHobbies")
-     
-//      public ResponseEntity <Map<String, List<UserDto>>> listaHobbies() {
-//          userService.findAll().stream().map(p -> modelMapper.map(p, UserDto.class))
-//     .collect(Collectors.toList());
 
-// Map<String, List<UserDto>> usuariosPorHobbie = new HashMap<>(); 
-// List<UserDto> usuariosDto = userService.findAll().stream().map(p -> modelMapper.map(p, UserDto.class))
-// .collect(Collectors.toList());
-//  usuariosPorHobbie = usuariosDto.stream().collect(Collectors.groupingBy(p -> p.getHobbie())); 
- 
-//  return new ResponseEntity<>(usuariosPorHobbie, HttpStatus.OK);
+    /* 3. UPDATE USER */
+
+    @PutMapping("/updateUser/{currentUserEmail}")
+    @Transactional
+    public ResponseEntity<Map<String, Object>> update(
+            @Valid @RequestPart(name = "user") User user,
+            BindingResult result,
+            @PathVariable(name = "currentUserEmail") String currentUserEmail,
+            @RequestPart(name = "fileUser", required = false) MultipartFile fileUser)
+            // ,
+            // @RequestPart(name = "email", required = false) String email)
+            throws IOException {
+
+        Map<String, Object> responseAsMap = new HashMap<>();
+        ResponseEntity<Map<String, Object>> responseEntity = null;
+
+        // Validación email
+        if (IsValidEmail(user) == false) {
+            String mensajeError = "Sólo puede utilizar un email del dominio de la empresa";
+            responseAsMap.put("error", mensajeError);
+            return new ResponseEntity<>(responseAsMap, HttpStatus.BAD_REQUEST);
+        }
+
+        if (!currentUserEmail.equals(user.getEmail())) {
+            String mensajeError = "Sólo puede actualizar su perfil";
+            responseAsMap.put("error", mensajeError);
+            return new ResponseEntity<>(responseAsMap, HttpStatus.BAD_REQUEST);
+
+        }
+        if (result.hasErrors()) {
+            List<String> errorMessages = new ArrayList<>();
+            for (ObjectError error : result.getAllErrors()) {
+                errorMessages.add(error.getDefaultMessage());
+            }
+            responseAsMap.put("errores", errorMessages);
+            responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.BAD_REQUEST);
+            return responseEntity;
+        }
+
+        if (!fileUser.isEmpty()) {
+            String fileCode = fileUploadUtil.saveFile(fileUser.getOriginalFilename(), fileUser);
+            user.setImageUser(fileCode + "-" + fileUser.getOriginalFilename());
+            FileUploadResponse fileUploadResponse = FileUploadResponse
+                    .builder()
+                    .fileName(fileCode + "-" + fileUser.getOriginalFilename())
+                    .downloadURI("/users/downloadFile/" + fileCode + "-" + fileUser.getOriginalFilename())
+                    .size(fileUser.getSize())
+                    .build();
+            responseAsMap.put("info de la imagen: ", fileUploadResponse);
+        }
+
+        User userDB = userService.update(user);
+
+        try {
+            if (userDB != null) {
+                Department department = userDB.getDepartment();
+                List<Yard> yards = userDB.getYards();
+
+                if (department != null) {
+                    departmentService.save(department);
+                    userDB.setDepartment(department);
+                }
+
+                if (yards.size() != 0) {
+                    for (Yard yard : yards) {
+                        yardService.save(yard);
+                    }
+                    userDB.setYards(yards);
+                }
+                String message = "El usuario se ha actualizado correctamente";
+                responseAsMap.put("mensaje", message);
+                responseAsMap.put("usuario", userDB);
+                responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.CREATED);
+
+            } else {
+                String errorMensaje = "El usuario no se ha actualizado correctamente";
+                responseAsMap.put("mensaje", errorMensaje);
+                responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap,
+                        HttpStatus.INTERNAL_SERVER_ERROR);
+
+            }
+        } catch (DataAccessException e) {
+            String errorGrave = "Se ha producido un error grave y la causa puede ser " + e.getMostSpecificCause();
+            responseAsMap.put("errorGrave", errorGrave);
+            responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return responseEntity;
+    }
+
+ /*4. ORDENAR POR GRUPOS */
+
+ //ORDENADO POR YARD
+//  @GetMapping("/yards")
+
+//  public ResponseEntity <Map <Object, List<UserDto>>> listaYards() {
+//  Map<Object, List<UserDto>> usuariosPorYards = new HashMap<>();
+//  List<UserDto> usuariosDto = userService.findAll().stream().map(p ->
+//  modelMapper.map(p, UserDto.class))
+//  .collect(Collectors.toList());
+//   usuariosPorYards = usuariosDto.stream().collect(Collectors.groupingBy(p ->
+//  p.getYards()));
+
+//   return new ResponseEntity<>(usuariosPorYards, HttpStatus.OK);
+
+// }
+
     
 }

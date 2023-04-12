@@ -6,7 +6,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
-import com.example.DTO.UserDto;
 import com.example.entities.User;
 
 public interface UserService {
@@ -18,9 +17,9 @@ public interface UserService {
     
     //service security
     
-    User add(User user);
-    List<User> findAll();
-    void deleteByEmail(String email);
-    User findByEmail(String email);
-    User update(User user);
+    public User add(User user);
+    public List<User> findAll();
+    public void deleteByEmail(String email);
+    public User findByEmail(String email);
+    public User update(User user);
 }

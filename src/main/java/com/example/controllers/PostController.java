@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.DTO.UserDto;
 import com.example.entities.Post;
 import com.example.entities.User;
 import com.example.model.FileUploadResponse;
@@ -62,7 +63,7 @@ public class PostController {
 
     // METODO FINDALL
 
-    @GetMapping("/All")
+    @GetMapping("/all")
     public ResponseEntity<List<Post>> findAll(@RequestParam(name = "page", required = false) Integer page,
             @RequestParam(name = "size", required = false) Integer size) {
 
@@ -98,6 +99,8 @@ public class PostController {
         return responseEntity;
 
     }
+
+    ///// PRUEBA
 
     // IMAGENES Y CREADO
     @PostMapping(consumes = "multipart/form-data")

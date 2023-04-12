@@ -58,9 +58,9 @@ public class User implements Serializable {
     private String email;
 
     @NotEmpty(message = "El campo <contraseña> no puede estar vacío")
+    @JsonIgnore
     private String password;
 
-    @NotEmpty(message = "El campo <ciudad> no puede estar vacía")
     private String city;
 
     private List<String> hobbie;

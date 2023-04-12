@@ -3,6 +3,9 @@ package com.example.entities;
 
 import java.io.Serializable;
 
+import com.example.DTO.UserDto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -39,10 +42,10 @@ public class Post implements Serializable {
 
     private String imagePost;
 
-
     //RELACION POST - USER
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
+  
     private User user; 
     
 }
