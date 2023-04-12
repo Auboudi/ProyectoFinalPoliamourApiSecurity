@@ -44,6 +44,7 @@ import com.example.services.UserService;
 import com.example.services.YardService;
 import com.example.utilities.FileDownloadUtil;
 import com.example.utilities.FileUploadUtil;
+import com.fasterxml.jackson.databind.deser.DataFormatReaders.Match;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -71,23 +72,19 @@ public class UserController {
     @Autowired
     private ModelMapper modelMapper;
 
-
-    /*UTILIDADES */
+    /* UTILIDADES */
 
     // Método validación email
-    public static bool IsValidEmail(string email){
-    Matcher matcher = pattern.matcher(user.getEmail());
- 
-    if (matcher.find() == false) {
-        String mensajeError = "Sólo puede usar un correo @poliamor.";
-    responseAsMap.put("error", mensajeError);
-    return new ResponseEntity<>(responseAsMap, HttpStatus.BAD_REQUEST);
-    } 
-
-    Pattern pattern = Pattern
-     .compile("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@poliamor.com");}
-     
-
+    public static boolean IsValidEmail(User user) {
+        Pattern pattern = Pattern
+                .compile("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@poliamor.com");
+        Matcher matcher = pattern.matcher(user.getEmail());
+        if (matcher.find() == true) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     /* OPCIONES DE ADMINISTRACIÓN */
 
@@ -249,11 +246,14 @@ public class UserController {
         Map<String, Object> responseAsMap = new HashMap<>();
         ResponseEntity<Map<String, Object>> responseEntity = null;
 
-      
+        // Validación email
+        if (IsValidEmail(user) == false) {
+            String mensajeError = "Sólo puede utilizar un email del dominio de la empresa";
+            responseAsMap.put("error", mensajeError);
+            return new ResponseEntity<>(responseAsMap, HttpStatus.BAD_REQUEST);
+        }
 
-      
         if (result.hasErrors()) {
-
 
             List<String> errorMessages = new ArrayList<>();
 
@@ -365,6 +365,12 @@ public class UserController {
         Map<String, Object> responseAsMap = new HashMap<>();
         ResponseEntity<Map<String, Object>> responseEntity = null;
 
+        // Validación email
+        if (IsValidEmail(user) == false) {
+            String mensajeError = "Sólo puede utilizar un email del dominio de la empresa";
+            responseAsMap.put("error", mensajeError);
+            return new ResponseEntity<>(responseAsMap, HttpStatus.BAD_REQUEST);
+        }
         if (result.hasErrors()) {
             List<String> errorMessages = new ArrayList<>();
             for (ObjectError error : result.getAllErrors()) {
@@ -434,6 +440,7 @@ public class UserController {
     @GetMapping("/find/{email}")
     public ResponseEntity<UserDto> findByEmail(@PathVariable(name = "email") String email) {
 
+
         User userNormal = userService.findByEmail(email);
         UserDto userDtoEmail = modelMapper.map(userNormal, UserDto.class);
         return new ResponseEntity<>(userDtoEmail, HttpStatus.OK);
@@ -454,6 +461,13 @@ public class UserController {
 
         Map<String, Object> responseAsMap = new HashMap<>();
         ResponseEntity<Map<String, Object>> responseEntity = null;
+
+        // Validación email
+        if (IsValidEmail(user) == false) {
+            String mensajeError = "Sólo puede utilizar un email del dominio de la empresa";
+            responseAsMap.put("error", mensajeError);
+            return new ResponseEntity<>(responseAsMap, HttpStatus.BAD_REQUEST);
+        }
 
         if (!currentUserEmail.equals(user.getEmail())) {
 
