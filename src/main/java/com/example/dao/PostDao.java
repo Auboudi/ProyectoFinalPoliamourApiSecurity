@@ -27,4 +27,7 @@ public interface PostDao extends JpaRepository<Post, Long> {
     @Query(value = "select p from Post p join fetch p.user u where u.id= :id")
     public List<Post> findByUserId(long id);
 
+    @Query(value = "select p from Post p join fetch p.user u where u.email= :email")
+    public List<Post> findByEmail(String email);
+
 }

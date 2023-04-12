@@ -15,10 +15,10 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private static final String[] SECURED_URLs = {"/users/admin/**"};
+    private static final String[] SECURED_URLs = {"/users/admin/**", "posts/update/{id}" };
 
     private static final String[] UN_SECURED_URLs = {"/users/all","users/find/**" , "posts/postsAll", "users/updateUser", "users/add", 
-"users/yards", "posts/all"};    
+"users/yards", "posts/update/{id}/{currentUserEmail}", "posts/delete/{id}/{currentUserEmail}" };    
 
 
     @Bean

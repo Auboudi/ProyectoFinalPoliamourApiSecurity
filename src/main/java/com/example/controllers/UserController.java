@@ -451,8 +451,6 @@ public class UserController {
             BindingResult result,
             @PathVariable(name = "currentUserEmail") String currentUserEmail,
             @RequestPart(name = "fileUser", required = false) MultipartFile fileUser)
-            // ,
-            // @RequestPart(name = "email", required = false) String email)
             throws IOException {
 
         Map<String, Object> responseAsMap = new HashMap<>();
@@ -534,15 +532,15 @@ public class UserController {
  /*4. ORDENAR POR GRUPOS */
 
  //ORDENADO POR YARD
-//  @GetMapping("/yards")
+//   @GetMapping("/yards")
 
-//  public ResponseEntity <Map <Object, List<UserDto>>> listaYards() {
-//  Map<Object, List<UserDto>> usuariosPorYards = new HashMap<>();
-//  List<UserDto> usuariosDto = userService.findAll().stream().map(p ->
-//  modelMapper.map(p, UserDto.class))
+//   public ResponseEntity <Map <UserDto, List<Post>>> lista() {
+//   Map<Object, List<UserDto>> usuariosPorYards = new HashMap<>();
+//   List<UserDto> usuariosDto = userService.findAll().stream().map(p ->
+//   modelMapper.map(p, UserDto.class))
 //  .collect(Collectors.toList());
-//   usuariosPorYards = usuariosDto.stream().collect(Collectors.groupingBy(p ->
-//  p.getYards()));
+//    usuariosPorYards = usuariosDto.stream().map(Object).collect(Collectors.groupingBy(p ->
+//  p.getPosts());
 
 //   return new ResponseEntity<>(usuariosPorYards, HttpStatus.OK);
 

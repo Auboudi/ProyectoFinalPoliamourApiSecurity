@@ -31,7 +31,6 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.DTO.UserDto;
 import com.example.entities.Post;
 import com.example.entities.User;
 import com.example.model.FileUploadResponse;
@@ -61,49 +60,37 @@ public class PostController {
     @Autowired
     private UserService userService;
 
-    // METODO FINDALL
+    /* 1. LISTADO DE POST */
 
     @GetMapping("/all")
     public ResponseEntity<List<Post>> findAll(@RequestParam(name = "page", required = false) Integer page,
             @RequestParam(name = "size", required = false) Integer size) {
 
         ResponseEntity<List<Post>> responseEntity = null;
-
         List<Post> posts = new ArrayList<>();
-
         Sort sortById = Sort.by("id");
-
         if (page != null && size != null) {
-
             try {
                 Pageable pageable = PageRequest.of(page, size, sortById);
                 Page<Post> postsPaginados = postService.findAll(pageable);
                 posts = postsPaginados.getContent();
                 responseEntity = new ResponseEntity<List<Post>>(posts, HttpStatus.OK);
-
             } catch (Exception e) {
                 responseEntity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
         } else {
-
             try {
-
                 posts = postService.findAll(sortById);
-
                 responseEntity = new ResponseEntity<List<Post>>(posts, HttpStatus.OK);
-
             } catch (Exception e) {
                 responseEntity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
             }
         }
         return responseEntity;
-
     }
 
-    ///// PRUEBA
-
-    // IMAGENES Y CREADO
-    @PostMapping(consumes = "multipart/form-data")
+    /* 2. CREACIÓN DE POST */
+    @PostMapping(value = "/add", consumes = "multipart/form-data")
     @Transactional
     public ResponseEntity<Map<String, Object>> insert(@Valid @RequestPart(name = "post") Post post,
             BindingResult result,
@@ -114,19 +101,14 @@ public class PostController {
         ResponseEntity<Map<String, Object>> responseEntity = null;
 
         if (result.hasErrors()) {
-
             List<String> errorMessages = new ArrayList<>();
-
             for (ObjectError error : result.getAllErrors()) {
-
                 errorMessages.add(error.getDefaultMessage());
 
             }
 
             responseAsMap.put("errores", errorMessages);
-
             responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.BAD_REQUEST);
-
             return responseEntity;
 
         }
@@ -150,18 +132,14 @@ public class PostController {
         try {
 
             if (postDB != null) {
-
                 String message = "El post se ha creado correctamente";
                 responseAsMap.put("mensaje", message);
                 responseAsMap.put("post", postDB);
                 responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.CREATED);
 
             } else {
-
                 String message = "El post no se ha creado correctamente";
-
                 responseAsMap.put("mensaje", message);
-
                 responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.BAD_REQUEST);
 
             }
@@ -172,7 +150,6 @@ public class PostController {
                     + e.getMostSpecificCause();
 
             responseAsMap.put("errorGrave", errorGrave);
-
             responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.INTERNAL_SERVER_ERROR);
 
         }
@@ -180,8 +157,48 @@ public class PostController {
         return responseEntity;
     }
 
-    // BUSCAR POR ID USER -> BETTER SI LO PONEMOS POR NOMBRE
-    @GetMapping("/{id}")
+    /* 3.BUSQUEDA */
+
+    // BUSCAR POR EMAIL
+    @GetMapping("/buscar/email/{email}")
+    public ResponseEntity<Map<String, Object>> findByUserId(@PathVariable(name = "email") String email) {
+
+        ResponseEntity<Map<String, Object>> responseEntity = null;
+
+        Map<String, Object> responseAsMap = new HashMap<>();
+
+        try {
+
+            List<Post> post = postService.findByEmail(email);
+
+            if (post != null) {
+                String successMessage = "Se ha encontrado los Post del usuario con email: " + email + " correctamente";
+                responseAsMap.put("mensaje", successMessage);
+                responseAsMap.put("post", post);
+                // responseAsMap.put("mascotas", cliente.getMascotas());
+                responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.OK);
+
+            } else {
+
+                String errorMessage = "No se ha encontrado los Posts del usuario con email: " + email;
+                responseAsMap.put("error", errorMessage);
+                responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.NOT_FOUND);
+
+            }
+
+        } catch (Exception e) {
+
+            String errorGrave = "Error grave";
+            responseAsMap.put("error", errorGrave);
+            responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.INTERNAL_SERVER_ERROR);
+
+        }
+
+        return responseEntity;
+    }
+
+    // BUSCAR POR IDUSER
+    @GetMapping("/buscar/id/{id}")
     public ResponseEntity<Map<String, Object>> findByUserId(@PathVariable(name = "id") Integer id) {
 
         ResponseEntity<Map<String, Object>> responseEntity = null;
@@ -218,32 +235,51 @@ public class PostController {
         return responseEntity;
     }
 
-    // ACTUALIZACION = RESOLVER PERMISOS
+    /* DESCARGAR IMAGENES - TODOS */
+    @GetMapping("/downloadFile/{fileCode}")
+    public ResponseEntity<?> downloadFile(@PathVariable(name = "fileCode") String fileCode) {
 
-    @PutMapping("/{id}")
+        Resource resource = null;
+
+        try {
+            resource = fileDownloadUtil.getFileAsResource(fileCode);
+        } catch (IOException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+
+        if (resource == null) {
+            return new ResponseEntity<>("File not found ", HttpStatus.NOT_FOUND);
+        }
+
+        String contentType = "application/octet-stream";
+        String headerValue = "attachment; filename=\"" + resource.getFilename() + "\"";
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
+                .body(resource);
+
+    }
+
+    /* ACTUALIZACIÓN -ADMIN */
+
+    @PutMapping("update/{id}")
     @Transactional
     public ResponseEntity<Map<String, Object>> update(
             @Valid @RequestPart(name = "post") Post post,
             BindingResult result,
             @RequestPart(name = "filePost", required = false) MultipartFile filePost,
-
             @RequestPart(name = "user", required = false) User user,
-
             @PathVariable(name = "id") Integer id) throws IOException {
-
         Map<String, Object> responseAsMap = new HashMap<>();
         ResponseEntity<Map<String, Object>> responseEntity = null;
 
         if (result.hasErrors()) {
-
             List<String> errorMessages = new ArrayList<>();
-
             for (ObjectError error : result.getAllErrors()) {
                 errorMessages.add(error.getDefaultMessage());
             }
-
             responseAsMap.put("errores", errorMessages);
-
             responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.BAD_REQUEST);
             return responseEntity;
         }
@@ -251,7 +287,6 @@ public class PostController {
         if (!filePost.isEmpty()) {
             String fileCode = fileUploadUtil.saveFile(filePost.getOriginalFilename(), filePost);
             post.setImagePost(fileCode + "-" + filePost.getOriginalFilename());
-
             FileUploadResponse fileUploadResponse = FileUploadResponse
                     .builder()
                     .fileName(fileCode + "-" + filePost.getOriginalFilename())
@@ -266,26 +301,19 @@ public class PostController {
         Post postDB = postService.save(post);
 
         try {
-
             if (postDB != null) {
-
                 if (user != null) {
-
                     userService.save(user);
                     postDB.setUser(user);
                 }
-
                 String message = "El post se ha actualizado correctamente";
                 responseAsMap.put("mensaje", message);
                 responseAsMap.put("post", postDB);
                 responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.CREATED);
 
             } else {
-
                 String errorMensaje = "El post no se ha actualizado correctamente";
-
                 responseAsMap.put("mensaje", errorMensaje);
-
                 responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap,
                         HttpStatus.INTERNAL_SERVER_ERROR);
 
@@ -301,9 +329,9 @@ public class PostController {
 
     }
 
-    // BORRADO
+    /* BORRAR -ADMIN */
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("delete/{id}")
     @Transactional
     public ResponseEntity<String> delete(@PathVariable(name = "id") Integer id) {
         ResponseEntity<String> responseEntity = null;
@@ -330,33 +358,115 @@ public class PostController {
 
     }
 
-    // ESTO NO ES NECESARIO
-    @GetMapping("/downloadFile/{fileCode}")
-    public ResponseEntity<?> downloadFile(@PathVariable(name = "fileCode") String fileCode) {
+    /* ACTUALIZACIÓN -USER */
 
-        Resource resource = null;
+    @PutMapping("update/{id}/{currentUserEmail}")
+    @Transactional
+    public ResponseEntity<Map<String, Object>> updateUserPost(
+            @Valid @RequestPart(name = "post") Post post,
+            BindingResult result,
+            @PathVariable(name = "currentUserEmail", required = true) String currentUserEmail,
+            @RequestPart(name = "filePost", required = false) MultipartFile filePost,
+            @RequestPart(name = "user", required = false) User user,
+            @PathVariable(name = "id") Integer id) throws IOException {
+        Map<String, Object> responseAsMap = new HashMap<>();
+        ResponseEntity<Map<String, Object>> responseEntity = null;
 
+        if (result.hasErrors()) {
+            List<String> errorMessages = new ArrayList<>();
+            for (ObjectError error : result.getAllErrors()) {
+                errorMessages.add(error.getDefaultMessage());
+            }
+            responseAsMap.put("errores", errorMessages);
+            responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.BAD_REQUEST);
+            return responseEntity;
+        }
+      
+        if (!filePost.isEmpty()) {
+            String fileCode = fileUploadUtil.saveFile(filePost.getOriginalFilename(), filePost);
+            post.setImagePost(fileCode + "-" + filePost.getOriginalFilename());
+            FileUploadResponse fileUploadResponse = FileUploadResponse
+                    .builder()
+                    .fileName(fileCode + "-" + filePost.getOriginalFilename())
+                    .downloadURI("/posts/downloadFile/" + fileCode + "-" + filePost.getOriginalFilename())
+                    .size(filePost.getSize())
+                    .build();
+
+            responseAsMap.put("info de la imagen: ", fileUploadResponse);
+        }
+
+        
+        post.setId(id);
+        Post postDB = postService.save(post);
+       
         try {
-            resource = fileDownloadUtil.getFileAsResource(fileCode);
-        } catch (IOException e) {
-            return ResponseEntity.internalServerError().build();
+            if (postDB != null) {
+                if(user !=null){
+
+                    userService.save(user);
+                postDB.setUser(user);
+                String message = "El post se ha actualizado correctamente";
+                responseAsMap.put("mensaje", message);
+                responseAsMap.put("post", postDB);
+                responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.CREATED);
+                }
+            } else {
+                String errorMensaje = "El post no se ha actualizado correctamente";
+                responseAsMap.put("mensaje", errorMensaje);
+                responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap,
+                        HttpStatus.INTERNAL_SERVER_ERROR);
+
+            }
+
+        } catch (DataAccessException e) {
+            String errorGrave = "Se ha producido un error grave y la causa puede ser " + e.getMostSpecificCause();
+            responseAsMap.put("errorGrave", errorGrave);
+            responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        if (resource == null) {
-            return new ResponseEntity<>("File not found ", HttpStatus.NOT_FOUND);
-        }
-
-        String contentType = "application/octet-stream";
-        String headerValue = "attachment; filename=\"" + resource.getFilename() + "\"";
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(contentType))
-                .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
-                .body(resource);
+        return responseEntity;
 
     }
 
-    /// POST PARA USERS
+    /* BORRAR -USER */
+
+    @DeleteMapping("delete/{id}/{currentUserEmail}")
+    @Transactional
+    public ResponseEntity<String> deleteUserPosts(@PathVariable(name = "id") Integer id,
+            @PathVariable(name = "currentUserEmail") String currentUserEmail) {
+        ResponseEntity<String> responseEntity = null;
+
+       
+        // if (!currentUserEmail.equals((user1.getEmail()))) {
+
+        //     String mensajeError = "Sólo puede actualizar su perfil";
+        //     responseEntity = new ResponseEntity<String>(mensajeError, HttpStatus.OK);
+
+        // }
+
+        try {        
+            Post post = postService.findbyId(id);
+
+            User user1 = post.getUser();
+            if (post != null && currentUserEmail.equals((user1.getEmail()))) {
+                postService.delete(post);
+                responseEntity = new ResponseEntity<String>("Post borrado exitosamente", HttpStatus.OK);
+            } else {
+
+                responseEntity = new ResponseEntity<String>("Post no encontrado o usuario equivocado", HttpStatus.NOT_FOUND);
+            }
+
+
+        } catch (DataAccessException e) {
+            e.getMostSpecificCause();
+            responseEntity = new ResponseEntity<String>("Error fatal", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return responseEntity;
+
+    }
+    /* */
+    //
     // @GetMapping("/postsAll")
     // public List<PostDto> findAll() {
     // return postService.findAll().stream().map(p -> modelMapper.map(p,
