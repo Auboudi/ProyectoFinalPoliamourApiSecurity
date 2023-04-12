@@ -20,6 +20,7 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -33,6 +34,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Table(name="user")
 
 public class User implements Serializable {
 
@@ -56,9 +58,9 @@ public class User implements Serializable {
     private String email;
 
     @NotEmpty(message = "El campo <contraseña> no puede estar vacío")
+    @JsonIgnore
     private String password;
 
-    @NotEmpty(message = "El campo <ciudad> no puede estar vacía")
     private String city;
 
     private List<String> hobbie;
@@ -70,9 +72,7 @@ public class User implements Serializable {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    public enum Role {
-        ADMIN, USER;
-    }
+ 
 
     // 1. RELACION USER-DEPARTMENT
 
@@ -98,3 +98,5 @@ public class User implements Serializable {
 
     
 }
+
+

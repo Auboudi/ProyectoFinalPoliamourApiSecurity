@@ -15,11 +15,10 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private static final String[] SECURED_URLs = {"/posts/**"};
+    private static final String[] SECURED_URLs = {"/users/admin/**"};
 
-    private static final String[] UN_SECURED_URLs = {
-            "/users/**"
-    };    
+    private static final String[] UN_SECURED_URLs = {"/users/all","users/find/**" , "posts/postsAll", "users/updateUser", "users/add", 
+"users/yards", "posts/all"};    
 
 
     @Bean
@@ -41,7 +40,7 @@ public class SecurityConfig {
     }
 
     // public static void main(String[] args) {
-    //     System.out.println(new SecurityConfig().passwordEncoder().encode("xxx"));
+    //      System.out.println(new SecurityConfig().passwordEncoder().encode("Temp2023$$"));
     // }
 
 }

@@ -37,3 +37,5 @@ build/
 
 ### Añadir el application properties ###
 */properties
+src/main/resources/application.properties
+src/main/resources/application.properties

@@ -16,4 +16,5 @@ public interface PostService {
     public Post save (Post post);
     public void delete (Post post); 
     public List<Post> findByUserId(long id);
+    List <Post> findAll();
 }

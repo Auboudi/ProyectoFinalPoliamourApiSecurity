@@ -95,11 +95,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public User update(User user) {
 
-        User existingUser = userRepository.findByEmail(user.getEmail())
+        User existingUser = userRepository.findById(user.getId())
                     .orElseThrow(() -> new UsernameNotFoundException("No existe user con dicho email"));
-
+        
         existingUser.setName(user.getName());
         existingUser.setSurnames(user.getSurnames());
+        existingUser.setEmail(user.getEmail());
         existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
         existingUser.setRole(user.getRole());
         
