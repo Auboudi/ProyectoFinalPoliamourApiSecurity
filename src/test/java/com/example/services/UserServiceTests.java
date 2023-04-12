@@ -43,10 +43,7 @@ public class UserServiceTests {
 
     @Mock
     private YardDao yardDao;
-
-    @Mock
-    private PostDao postDao;
-    
+  
 
     @InjectMocks
     private UserServiceImpl userService;
@@ -133,6 +130,8 @@ public class UserServiceTests {
         assertThat(usuarios).isEmpty();
 
     }
+
+    
 
 
 
