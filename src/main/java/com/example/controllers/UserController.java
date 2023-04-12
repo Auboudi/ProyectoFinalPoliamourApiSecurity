@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
@@ -53,21 +54,18 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-
     @Autowired
     private FileUploadUtil fileUploadUtil;
-
     @Autowired
     private FileDownloadUtil fileDownloadUtil;
-
     @Autowired
     private DepartmentService departmentService;
-
     @Autowired
     private YardService yardService;
-
     @Autowired
     private ModelMapper modelMapper;
+
+
 
     /* OPCIONES DE ADMINISTRACIÓN */
 
@@ -259,11 +257,12 @@ public class UserController {
 
     /* ACTUALIZAR USERS */
 
-    @PutMapping("/update")
+    @PutMapping("/update/{currentUserEmail}")
     @Transactional
     public ResponseEntity<Map<String, Object>> update(
             @Valid @RequestPart(name = "user") User user,
             BindingResult result,
+            @PathVariable(name = "currentUserEmail")  String currentUserEmail, 
             @RequestPart(name = "fileUser", required = false) MultipartFile fileUser)
             // ,
             // @RequestPart(name = "email", required = false) String email)
@@ -272,6 +271,13 @@ public class UserController {
         Map<String, Object> responseAsMap = new HashMap<>();
         ResponseEntity<Map<String, Object>> responseEntity = null;
 
+if (!currentUserEmail.equals(user.getEmail())){
+
+    String mensajeError = "Sólo puede actualizar su perfil"; 
+    responseAsMap.put("error",mensajeError); 
+    return new ResponseEntity<>(responseAsMap, HttpStatus.BAD_REQUEST); 
+    
+}
         if (result.hasErrors()) {
 
             List<String> errorMessages = new ArrayList<>();
@@ -307,7 +313,6 @@ public class UserController {
             if (userDB != null) {
 
                 Department department = userDB.getDepartment();
-
                 List<Yard> yards = userDB.getYards();
 
                 if (department != null) {
@@ -359,9 +364,10 @@ public class UserController {
     /* 1. LISTADO USER */
 
     @GetMapping("/all")
-    public List<UserDto> findAll() {
-        return userService.findAll().stream().map(p -> modelMapper.map(p, UserDto.class))
+    public ResponseEntity <List<UserDto>> findAllUsers() {
+        List <UserDto> listaUsuarios = userService.findAll().stream().map(p -> modelMapper.map(p, UserDto.class))
                 .collect(Collectors.toList());
+                return new ResponseEntity<>(listaUsuarios, HttpStatus.OK);  
     }
 
     /* 2. BUSCAR USUARIOS */
@@ -371,11 +377,36 @@ public class UserController {
     public ResponseEntity<UserDto> findByEmail(@PathVariable(name = "email") String email) {
 
         User userNormal = userService.findByEmail(email);
-
         UserDto userDtoEmail = modelMapper.map(userNormal, UserDto.class);
+        return new ResponseEntity<>(userDtoEmail, HttpStatus.OK);  
+    }
 
-        return ResponseEntity.ok().body(userDtoEmail);
+    /** */
+    @GetMapping("/allHobbies")
+     
+     public List userService.findAll().stream().map(p -> modelMapper.map(p, UserDto.class))
+    .collect(Collectors.toList());
+
     }
 
     
-}
+
+    // /*2.2. BUSCAR POR HOBBIES */
+
+    // // @GetMapping("/hobbie")
+    
+    // // public List<UserDto> findAllHobbies(){
+
+    // //    var todos = userService.findAll().stream().map(p -> modelMapper.map(p, UserDto.class))
+    // //     .collect(Collectors.groupingBy(n -> n.getHobbie()));
+
+    // //    return todos.entrySet().stream().flatMap().collect(Collectors.toList());
+
+     
+
+
+    }
+
+
+    
+    

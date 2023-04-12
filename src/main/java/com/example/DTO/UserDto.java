@@ -18,7 +18,9 @@ public class UserDto implements Serializable {
     private String name;
     private String surnames;
     private String city;
-    private List<String> hobbie;
+    private String hobbie;
+    private String hobbie2; 
+    private String hobbie3; 
     private String imageUser;
 
 }

@@ -63,7 +63,9 @@ public class User implements Serializable {
     @NotEmpty(message = "El campo <ciudad> no puede estar vacía")
     private String city;
 
-    private List<String> hobbie;
+    private String hobbie; 
+    private String hobbie2;
+    private String hobbie3; 
 
     private String phone;
 

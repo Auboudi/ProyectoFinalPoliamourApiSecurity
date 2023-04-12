@@ -86,10 +86,7 @@ public class ProyectoFinalPoliamourApiApplication  implements CommandLineRunner{
 		List<Yard> listaYard2 = new ArrayList<>();
 		listaYard2.add(yard3);
 
-		List<String> hobbiesUser1 = new ArrayList<>();
-		hobbiesUser1.add("baloncesto");
-		hobbiesUser1.add("lectura");
-
+		
 		
 		userService.save(User.builder()
 			.id(1)
@@ -100,13 +97,11 @@ public class ProyectoFinalPoliamourApiApplication  implements CommandLineRunner{
 			.city("Murcia")
 			.department(departmentService.findbyId(1))
 			.yards(listaYard1)
-			.hobbie(hobbiesUser1)
+			.hobbie("padel")
 			.phone("677888999")
 			.build());
 
-		List<String> hobbiesUser2 = new ArrayList<>();
-		hobbiesUser2.add("futbol");
-		hobbiesUser2.add("lectura");
+	
 
 		userService.save(User.builder()
 			.id(2)
@@ -116,13 +111,11 @@ public class ProyectoFinalPoliamourApiApplication  implements CommandLineRunner{
 			.password("password2")
 			.city("Valencia")
 			.department(departmentService.findbyId(2))
-			.hobbie(hobbiesUser2)
+			.hobbie("tenis")
 			.phone("654632981")
 			.build());
 
-		List<String> hobbiesUser3 = new ArrayList<>();
-		hobbiesUser3.add("senderismo");
-		hobbiesUser3.add("equitacion");
+	
 		
 
 		userService.save(User.builder()
@@ -133,12 +126,11 @@ public class ProyectoFinalPoliamourApiApplication  implements CommandLineRunner{
 			.password("password3")
 			.city("Murcia")
 			.department(departmentService.findbyId(1))
-			.hobbie(hobbiesUser3)
+			.hobbie2("padel")
 			.yards(listaYard2)
 			.build());
 
-		List<String> hobbiesUser4 = new ArrayList<>();
-		hobbiesUser4.add("equitacion");
+	
 			
 	
 		userService.save(User.builder()
@@ -149,7 +141,7 @@ public class ProyectoFinalPoliamourApiApplication  implements CommandLineRunner{
 			.password("password3")				
 			.city("Murcia")
 			.department(departmentService.findbyId(1))
-			.hobbie(hobbiesUser4)				
+			.hobbie("Tenis")				
 			.yards(listaYard2)
 			.build());	
 
