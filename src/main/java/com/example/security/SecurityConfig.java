@@ -18,7 +18,7 @@ public class SecurityConfig {
     private static final String[] SECURED_URLs = {"/users/admin/**"};
 
     private static final String[] UN_SECURED_URLs = {"/users/all","users/find/**" , "posts/postsAll", "users/updateUser", "users/add", 
-"users/yards"};    
+"users/yards", "posts/all"};    
 
 
     @Bean
