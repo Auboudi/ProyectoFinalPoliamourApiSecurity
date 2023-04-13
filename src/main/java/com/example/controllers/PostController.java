@@ -90,10 +90,11 @@ public class PostController {
     }
 
     /* 2. CREACIÓN DE POST */
-    @PostMapping(value = "/add", consumes = "multipart/form-data")
+    @PostMapping(value = "/add/{email}", consumes = "multipart/form-data")
     @Transactional
     public ResponseEntity<Map<String, Object>> insert(@Valid @RequestPart(name = "post") Post post,
             BindingResult result,
+            @PathVariable(name = "email", required = true) String email,
             @RequestPart(name = "filePost", required = false) MultipartFile filePost) throws IOException {
 
         Map<String, Object> responseAsMap = new HashMap<>();
@@ -130,11 +131,12 @@ public class PostController {
         LocalDateTime datetime = LocalDateTime.now();
 
         Post postDB = postService.save(post);
-
+        User user1 = userService.findByEmail(email); 
         try {
 
             if (postDB != null) {
                 postDB.setFechaPublicacion(datetime);
+                postDB.setUser(user1);
                 String message = "El post se ha creado correctamente";
                 responseAsMap.put("mensaje", message);
                 responseAsMap.put("post", postDB);
