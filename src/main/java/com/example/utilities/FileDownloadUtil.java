@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class FileDownloadUtil {
-    
+
     private Path foundFile;
 
     public Resource getFileAsResource(String fileCode) throws IOException {
@@ -19,14 +19,14 @@ public class FileDownloadUtil {
         Path dirPath = Paths.get("Files-Upload");
 
         Files.list(dirPath).forEach(file -> {
-            if(file.getFileName().toString().startsWith(fileCode)) {
+            if (file.getFileName().toString().startsWith(fileCode)) {
                 foundFile = file;
 
-                return ;
+                return;
             }
         });
 
-        if(foundFile != null) {
+        if (foundFile != null) {
             return new UrlResource(foundFile.toUri());
         }
 

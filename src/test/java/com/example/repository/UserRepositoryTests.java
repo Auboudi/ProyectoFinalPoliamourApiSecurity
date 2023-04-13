@@ -1,5 +1,7 @@
 package com.example.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -11,24 +13,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import com.example.dao.DepartmentDao;
 import com.example.dao.YardDao;
 import com.example.entities.Department;
-
 import com.example.entities.Role;
 import com.example.entities.User;
 import com.example.entities.Yard;
 import com.example.services.UserRepository;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 // @SpringBootTest
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = Replace.NONE)
 public class UserRepositoryTests {
-    
+
     @Autowired
     private UserRepository userRepository;
 
@@ -38,7 +36,6 @@ public class UserRepositoryTests {
     @Autowired
     private YardDao yardDao;
 
-
     private User user0;
 
     private Department dpto0;
@@ -47,69 +44,64 @@ public class UserRepositoryTests {
 
     @BeforeEach
     void setUp() {
-        
+
         dpto0 = Department.builder()
-            .name("Dpto0")
-            .build();
+                .name("Dpto0")
+                .build();
 
         yard0 = Yard.builder()
-            .name("Yard0")
-            .build();
+                .name("Yard0")
+                .build();
 
         List<Yard> yards0 = new ArrayList<>();
 
         yards0.add(yard0);
 
-
         user0 = User.builder()
 
-            .name("Test User0")
-            .surnames("Test User 0")
-            .email("correoTest0@gmail.com")
-            .password("password")
-            .department(dpto0)
-            .city("Murcia")
-            .yards(yards0)
-            .role(Role.USER)
-            .build();
-
-
-
+                .name("Test User0")
+                .surnames("Test User 0")
+                .email("correoTest0@gmail.com")
+                .password("password")
+                .department(dpto0)
+                .city("Murcia")
+                .yards(yards0)
+                .role(Role.USER)
+                .build();
 
     }
 
     @Test
     @DisplayName("Test para agregar un user")
-    public void testAddUser(){
+    public void testAddUser() {
 
-       Department dpto1 = Department.builder()
-            .name("Dpto1")
-            .build();
+        Department dpto1 = Department.builder()
+                .name("Dpto1")
+                .build();
 
         departmentDao.save(dpto1);
 
         Yard yard1 = Yard.builder()
-            .name("Yard0")
-            .build();
-        
-            yardDao.save(yard1);
+                .name("Yard0")
+                .build();
+
+        yardDao.save(yard1);
 
         List<Yard> yards1 = new ArrayList<>();
 
         yards1.add(yard1);
 
-        
         User user1 = User.builder()
 
-            .name("Test User4")
-            .surnames("Test User 3")
-            .email("correoTest40@gmail.com")
-            .password("password")
-            .department(dpto1)
-            .city("Murcia")
-            .yards(yards1)
-            .role(Role.USER)
-            .build();
+                .name("Test User4")
+                .surnames("Test User 3")
+                .email("correoTest40@gmail.com")
+                .password("password")
+                .department(dpto1)
+                .city("Murcia")
+                .yards(yards1)
+                .role(Role.USER)
+                .build();
 
         User userAdd = userRepository.save(user1);
 
@@ -120,50 +112,49 @@ public class UserRepositoryTests {
 
     @DisplayName("Test para listar usuarios")
     @Test
-    public void testFindAllUsers(){
+    public void testFindAllUsers() {
 
         // Given
 
         Department dpto1 = Department.builder()
-        .name("Dpto1")
-        .build();
+                .name("Dpto1")
+                .build();
 
-    departmentDao.save(dpto1);
+        departmentDao.save(dpto1);
 
-    Yard yard1 = Yard.builder()
-        .name("Yard0")
-        .build();
-    
+        Yard yard1 = Yard.builder()
+                .name("Yard0")
+                .build();
+
         yardDao.save(yard1);
 
-    List<Yard> yards1 = new ArrayList<>();
+        List<Yard> yards1 = new ArrayList<>();
 
-    yards1.add(yard1);
+        yards1.add(yard1);
 
-    
-    User user1 = User.builder()
+        User user1 = User.builder()
 
-        .name("Test User2")
-        .surnames("Test User 2")
-        .email("correoTest2@gmail.com")
-        .password("password")
-        .department(dpto1)
-        .city("Murcia")
-        .yards(yards1)
-        .role(Role.USER)
-        .build();
-    
-    departmentDao.save(dpto0);
-    yardDao.save(yard0);
+                .name("Test User2")
+                .surnames("Test User 2")
+                .email("correoTest2@gmail.com")
+                .password("password")
+                .department(dpto1)
+                .city("Murcia")
+                .yards(yards1)
+                .role(Role.USER)
+                .build();
 
-    userRepository.save(user0);
-    userRepository.save(user1);
+        departmentDao.save(dpto0);
+        yardDao.save(yard0);
 
-    // When
+        userRepository.save(user0);
+        userRepository.save(user1);
 
-    List<User> usuarios = userRepository.findAll();
+        // When
 
-    // Then 
+        List<User> usuarios = userRepository.findAll();
+
+        // Then
 
     assertThat(usuarios).isNotNull();
     assertThat(usuarios).size().isEqualTo(9);
@@ -193,7 +184,6 @@ public class UserRepositoryTests {
 
         assertThat(user.getId()).isNotEqualTo(0L);
 
-
     }
 
     @Test
@@ -220,7 +210,6 @@ public class UserRepositoryTests {
         assertThat(userUpdated.getEmail()).isEqualTo("email@email.com");
         assertThat(userUpdated.getName()).isEqualTo("UPDATE");
         assertThat(userUpdated.getSurnames()).isEqualTo("UPDATE");
-
 
     }
 

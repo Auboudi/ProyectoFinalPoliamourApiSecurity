@@ -37,13 +37,12 @@ public class Department implements Serializable {
     @Size(min = 4, max = 25, message = "El nombre debe contener entre 4 y 25 caracteres")
     private String name;
 
-
-    //1. RELACIÓN DEPARTMENT-USER
+    // 1. RELACIÓN DEPARTMENT-USER
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, mappedBy = "department")
     @JsonIgnore
     private List<User> users;
 
-    //2.RELACION DEPARTMENT-YARD
+    // 2.RELACION DEPARTMENT-YARD
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, mappedBy = "department")
     @JsonIgnore
     private List<Yard> yards;

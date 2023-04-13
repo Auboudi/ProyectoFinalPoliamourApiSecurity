@@ -1,10 +1,9 @@
 package com.example.entities;
 
-
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
-import com.example.DTO.UserDto;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -29,9 +28,9 @@ import lombok.NoArgsConstructor;
 @Table(name = "posts")
 
 public class Post implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -42,10 +41,13 @@ public class Post implements Serializable {
 
     private String imagePost;
 
-    //RELACION POST - USER
+    @DateTimeFormat
+    private LocalDateTime fechaPublicacion;
+
+    // RELACION POST - USER
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
-  
-    private User user; 
-    
+
+    private User user;
+
 }

@@ -10,11 +10,20 @@ import com.example.entities.Post;
 
 public interface PostService {
 
-    public List <Post> findAll(Sort sort);
-    public Page <Post> findAll (Pageable pageable);
-    public Post findbyId (long id); 
-    public Post save (Post post);
-    public void delete (Post post); 
+    public List<Post> findAll(Sort sort);
+
+    public Page<Post> findAll(Pageable pageable);
+
+    public Post findbyId(long id);
+
+    public List<Post> findByEmail(String email);
+
+    public Post save(Post post);
+
+    public void delete(Post post);
+
     public List<Post> findByUserId(long id);
-    List <Post> findAll();
+
+    List<Post> findAll();
+
 }
