@@ -380,19 +380,7 @@ public class UserController {
             return responseEntity;
 
         }
-        if (!fileUser.isEmpty()) {
-            String fileCode = fileUploadUtil.saveFile(fileUser.getOriginalFilename(), fileUser);
-            user.setImageUser(fileCode + "-" + fileUser.getOriginalFilename());
-
-            FileUploadResponse fileUploadResponse = FileUploadResponse
-                    .builder()
-                    .fileName(fileCode + "-" + fileUser.getOriginalFilename())
-                    .downloadURI("/users/downloadFile/" + fileCode + "-" + fileUser.getOriginalFilename())
-                    .size(fileUser.getSize())
-                    .build();
-
-            responseAsMap.put("info de la imagen: ", fileUploadResponse);
-        }
+        
         User userDB = userService.add(user);
         try {
             if (userDB != null) {
@@ -400,7 +388,19 @@ public class UserController {
                 responseAsMap.put("mensaje", message);
                 responseAsMap.put("usuario", userDB);
                 responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.CREATED);
-            } else {
+                if (!fileUser.isEmpty()) {
+                    String fileCode = fileUploadUtil.saveFile(fileUser.getOriginalFilename(), fileUser);
+                    user.setImageUser(fileCode + "-" + fileUser.getOriginalFilename());
+        
+                    FileUploadResponse fileUploadResponse = FileUploadResponse
+                            .builder()
+                            .fileName(fileCode + "-" + fileUser.getOriginalFilename())
+                            .downloadURI("/users/downloadFile/" + fileCode + "-" + fileUser.getOriginalFilename())
+                            .size(fileUser.getSize())
+                            .build();
+        
+                    responseAsMap.put("info de la imagen: ", fileUploadResponse);
+                }} else {
                 String message = "El usuario no se ha creado correctamente";
                 responseAsMap.put("mensaje", message);
                 responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.BAD_REQUEST);
