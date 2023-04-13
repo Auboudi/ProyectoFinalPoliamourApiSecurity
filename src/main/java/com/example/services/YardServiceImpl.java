@@ -34,7 +34,4 @@ public class YardServiceImpl implements YardService {
         yardDao.delete(yard);
     }
 
-    
-
-    
 }

@@ -1,7 +1,11 @@
 package com.example.entities;
 
-
 import java.io.Serializable;
+import java.time.LocalDateTime;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -26,9 +30,9 @@ import lombok.NoArgsConstructor;
 @Table(name = "posts")
 
 public class Post implements Serializable {
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -39,10 +43,14 @@ public class Post implements Serializable {
 
     private String imagePost;
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat
+    private LocalDateTime fechaPublicacion;
 
-    //RELACION POST - USER
+    // RELACION POST - USER
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
-    private User user; 
-    
+
+    private User user;
+
 }

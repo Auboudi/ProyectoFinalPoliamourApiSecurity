@@ -1,6 +1,5 @@
 package com.example.security;
 
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -27,9 +26,9 @@ public class MyUserDetails implements UserDetails {
         this.password = user.getPassword();
 
         authorities = Arrays
-                   .stream(user.getRole().toString().split(","))
-                   .map(SimpleGrantedAuthority::new)
-                   .collect(Collectors.toList());
+                .stream(user.getRole().toString().split(","))
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -44,7 +43,7 @@ public class MyUserDetails implements UserDetails {
 
     @Override
     public String getUsername() {
-        return  this.userName;
+        return this.userName;
     }
 
     @Override
@@ -66,5 +65,5 @@ public class MyUserDetails implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-    
+
 }
