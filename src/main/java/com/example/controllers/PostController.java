@@ -160,7 +160,7 @@ public class PostController {
     /* 3.BUSQUEDA */
 
     // BUSCAR POR EMAIL
-    @GetMapping("/buscar/email/{email}")
+    @GetMapping("/find/email/{email}")
     public ResponseEntity<Map<String, Object>> findByUserId(@PathVariable(name = "email") String email) {
 
         ResponseEntity<Map<String, Object>> responseEntity = null;
@@ -198,7 +198,7 @@ public class PostController {
     }
 
     // BUSCAR POR IDUSER
-    @GetMapping("/buscar/id/{id}")
+    @GetMapping("/find/id/{id}")
     public ResponseEntity<Map<String, Object>> findByUserId(@PathVariable(name = "id") Integer id) {
 
         ResponseEntity<Map<String, Object>> responseEntity = null;
@@ -263,7 +263,7 @@ public class PostController {
 
     /* ACTUALIZACIÓN -ADMIN */
 
-    @PutMapping("update/{id}")
+    @PutMapping("/admin/update/{id}")
     @Transactional
     public ResponseEntity<Map<String, Object>> update(
             @Valid @RequestPart(name = "post") Post post,
@@ -331,7 +331,7 @@ public class PostController {
 
     /* BORRAR -ADMIN */
 
-    @DeleteMapping("delete/{id}")
+    @DeleteMapping("admin/delete/{id}")
     @Transactional
     public ResponseEntity<String> delete(@PathVariable(name = "id") Integer id) {
         ResponseEntity<String> responseEntity = null;
@@ -358,76 +358,6 @@ public class PostController {
 
     }
 
-    /* ACTUALIZACIÓN -USER */
-
-    @PutMapping("update/{id}/{currentUserEmail}")
-    @Transactional
-    public ResponseEntity<Map<String, Object>> updateUserPost(
-            @Valid @RequestPart(name = "post") Post post,
-            BindingResult result,
-            @PathVariable(name = "currentUserEmail", required = true) String currentUserEmail,
-            @RequestPart(name = "filePost", required = false) MultipartFile filePost,
-            @RequestPart(name = "user", required = false) User user,
-            @PathVariable(name = "id") Integer id) throws IOException {
-        Map<String, Object> responseAsMap = new HashMap<>();
-        ResponseEntity<Map<String, Object>> responseEntity = null;
-
-        if (result.hasErrors()) {
-            List<String> errorMessages = new ArrayList<>();
-            for (ObjectError error : result.getAllErrors()) {
-                errorMessages.add(error.getDefaultMessage());
-            }
-            responseAsMap.put("errores", errorMessages);
-            responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.BAD_REQUEST);
-            return responseEntity;
-        }
-      
-        if (!filePost.isEmpty()) {
-            String fileCode = fileUploadUtil.saveFile(filePost.getOriginalFilename(), filePost);
-            post.setImagePost(fileCode + "-" + filePost.getOriginalFilename());
-            FileUploadResponse fileUploadResponse = FileUploadResponse
-                    .builder()
-                    .fileName(fileCode + "-" + filePost.getOriginalFilename())
-                    .downloadURI("/posts/downloadFile/" + fileCode + "-" + filePost.getOriginalFilename())
-                    .size(filePost.getSize())
-                    .build();
-
-            responseAsMap.put("info de la imagen: ", fileUploadResponse);
-        }
-
-        
-        post.setId(id);
-        Post postDB = postService.save(post);
-       
-        try {
-            if (postDB != null) {
-                if(user !=null){
-
-                    userService.save(user);
-                postDB.setUser(user);
-                String message = "El post se ha actualizado correctamente";
-                responseAsMap.put("mensaje", message);
-                responseAsMap.put("post", postDB);
-                responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.CREATED);
-                }
-            } else {
-                String errorMensaje = "El post no se ha actualizado correctamente";
-                responseAsMap.put("mensaje", errorMensaje);
-                responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap,
-                        HttpStatus.INTERNAL_SERVER_ERROR);
-
-            }
-
-        } catch (DataAccessException e) {
-            String errorGrave = "Se ha producido un error grave y la causa puede ser " + e.getMostSpecificCause();
-            responseAsMap.put("errorGrave", errorGrave);
-            responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-
-        return responseEntity;
-
-    }
-
     /* BORRAR -USER */
 
     @DeleteMapping("delete/{id}/{currentUserEmail}")
@@ -436,15 +366,14 @@ public class PostController {
             @PathVariable(name = "currentUserEmail") String currentUserEmail) {
         ResponseEntity<String> responseEntity = null;
 
-       
         // if (!currentUserEmail.equals((user1.getEmail()))) {
 
-        //     String mensajeError = "Sólo puede actualizar su perfil";
-        //     responseEntity = new ResponseEntity<String>(mensajeError, HttpStatus.OK);
+        // String mensajeError = "Sólo puede actualizar su perfil";
+        // responseEntity = new ResponseEntity<String>(mensajeError, HttpStatus.OK);
 
         // }
 
-        try {        
+        try {
             Post post = postService.findbyId(id);
 
             User user1 = post.getUser();
@@ -453,9 +382,9 @@ public class PostController {
                 responseEntity = new ResponseEntity<String>("Post borrado exitosamente", HttpStatus.OK);
             } else {
 
-                responseEntity = new ResponseEntity<String>("Post no encontrado o usuario equivocado", HttpStatus.NOT_FOUND);
+                responseEntity = new ResponseEntity<String>("Post no encontrado o usuario equivocado",
+                        HttpStatus.NOT_FOUND);
             }
-
 
         } catch (DataAccessException e) {
             e.getMostSpecificCause();
