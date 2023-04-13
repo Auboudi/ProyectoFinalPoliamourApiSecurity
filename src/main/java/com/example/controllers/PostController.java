@@ -131,7 +131,8 @@ public class PostController {
         LocalDateTime datetime = LocalDateTime.now();
 
         Post postDB = postService.save(post);
-        User user1 = userService.findByEmail(email); 
+        User user1 = userService.findByEmail(email);
+        
         try {
 
             if (postDB != null) {

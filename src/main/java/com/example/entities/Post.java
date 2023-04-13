@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -41,6 +43,7 @@ public class Post implements Serializable {
 
     private String imagePost;
 
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     @DateTimeFormat
     private LocalDateTime fechaPublicacion;
 
