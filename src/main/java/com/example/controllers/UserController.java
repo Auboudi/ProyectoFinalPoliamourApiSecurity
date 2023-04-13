@@ -23,7 +23,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -51,7 +50,6 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/users")
-@CrossOrigin(origins = {"*"})
 
 public class UserController {
 
@@ -382,7 +380,7 @@ public class UserController {
             return responseEntity;
 
         }
-        
+
         User userDB = userService.add(user);
         try {
             if (userDB != null) {
@@ -393,16 +391,17 @@ public class UserController {
                 if (!fileUser.isEmpty()) {
                     String fileCode = fileUploadUtil.saveFile(fileUser.getOriginalFilename(), fileUser);
                     user.setImageUser(fileCode + "-" + fileUser.getOriginalFilename());
-        
+
                     FileUploadResponse fileUploadResponse = FileUploadResponse
                             .builder()
                             .fileName(fileCode + "-" + fileUser.getOriginalFilename())
                             .downloadURI("/users/downloadFile/" + fileCode + "-" + fileUser.getOriginalFilename())
                             .size(fileUser.getSize())
                             .build();
-        
+
                     responseAsMap.put("info de la imagen: ", fileUploadResponse);
-                }} else {
+                }
+            } else {
                 String message = "El usuario no se ha creado correctamente";
                 responseAsMap.put("mensaje", message);
                 responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.BAD_REQUEST);
@@ -558,23 +557,5 @@ public class UserController {
         }
         return responseEntity;
     }
-
-    /* 4. ORDENAR POR GRUPOS */
-
-    // ORDENADO POR YARD
-    // @GetMapping("/yards")
-
-    // public ResponseEntity <Map <UserDto, List<Post>>> lista() {
-    // Map<Object, List<UserDto>> usuariosPorYards = new HashMap<>();
-    // List<UserDto> usuariosDto = userService.findAll().stream().map(p ->
-    // modelMapper.map(p, UserDto.class))
-    // .collect(Collectors.toList());
-    // usuariosPorYards =
-    // usuariosDto.stream().map(Object).collect(Collectors.groupingBy(p ->
-    // p.getPosts());
-
-    // return new ResponseEntity<>(usuariosPorYards, HttpStatus.OK);
-
-    // }
 
 }

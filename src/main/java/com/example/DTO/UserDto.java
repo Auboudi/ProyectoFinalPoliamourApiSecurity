@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -18,15 +19,13 @@ import lombok.NoArgsConstructor;
 
 public class UserDto implements Serializable {
 
-
     private String name;
     private String surnames;
     private String city;
     private List<String> hobbie;
     private String imageUser;
-    private List <Yard> yards;
-    private List <Post> posts; 
-    private Department department; 
-
+    private List<Yard> yards;
+    private List<Post> posts;
+    private Department department;
 
 }

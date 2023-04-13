@@ -24,13 +24,10 @@ public class ProyectoFinalPoliamourApiApplication implements CommandLineRunner {
 
 	// @Autowired
 	// private UserService userService;
-
 	// @Autowired
 	// private DepartmentService departmentService;
-
 	// @Autowired
 	// private YardService yardService;
-
 	// @Autowired
 	// private PostService postService;
 
@@ -79,7 +76,6 @@ public class ProyectoFinalPoliamourApiApplication implements CommandLineRunner {
 				.id(4)
 				.build());
 
-
 		Yard yard1 = yardDao.save(Yard.builder()
 				.id(1)
 				.name("Java")
@@ -93,22 +89,22 @@ public class ProyectoFinalPoliamourApiApplication implements CommandLineRunner {
 				.build());
 
 		// Yard yard3 = yardDao.save(Yard.builder()
-		// 		.id(3)
-		// 		.name("Node")
-		// 		.department(departmentDao.findById(1L).get())
-		// 		.build());
-		
+		// .id(3)
+		// .name("Node")
+		// .department(departmentDao.findById(1L).get())
+		// .build());
+
 		// Yard yard4 = yardDao.save(Yard.builder()
-		// 		.id(4)
-		// 		.name("PHP")
-		// 		.department(departmentDao.findById(1L).get())
-		// 		.build());
+		// .id(4)
+		// .name("PHP")
+		// .department(departmentDao.findById(1L).get())
+		// .build());
 
 		// Yard yard5 = yardDao.save(Yard.builder()
-		// 		.id(5)
-		// 		.name("Yard3")
-		// 		.department(departmentDao.findById(1L).get())
-		// 		.build());
+		// .id(5)
+		// .name("Yard3")
+		// .department(departmentDao.findById(1L).get())
+		// .build());
 
 		List<Yard> listaYard1 = new ArrayList<>();
 		listaYard1.add(yard1);
@@ -139,58 +135,58 @@ public class ProyectoFinalPoliamourApiApplication implements CommandLineRunner {
 		// hobbiesUser2.add("lectura");
 
 		// userDao.save(User.builder()
-		// 		.id(2)
-		// 		.name("Paloma")
-		// 		.surnames("Galan")
-		// 		.email("palomagalan@gmail.com")
-		// 		.password("password2")
-		// 		.city("Valencia")
-		// 		.department(departmentDao.findById(2L).get())
-		// 		.hobbie(hobbiesUser2)
-		// 		.phone("654632981")
-		// 		.build());
+		// .id(2)
+		// .name("Paloma")
+		// .surnames("Galan")
+		// .email("palomagalan@gmail.com")
+		// .password("password2")
+		// .city("Valencia")
+		// .department(departmentDao.findById(2L).get())
+		// .hobbie(hobbiesUser2)
+		// .phone("654632981")
+		// .build());
 
 		List<String> hobbiesUser3 = new ArrayList<>();
 		hobbiesUser3.add("senderismo");
 		hobbiesUser3.add("equitacion");
 
 		// userDao.save(User.builder()
-		// 		.id(3)
-		// 		.name("Maria")
-		// 		.surnames("Romero")
-		// 		.email("mariaromero@gmail.com")
-		// 		.password("password3")
-		// 		.city("Murcia")
-		// 		.department(departmentDao.findById(1L).get())
-		// 		.hobbie(hobbiesUser3)
-		// 		.yards(listaYard2)
-		// 		.build());
+		// .id(3)
+		// .name("Maria")
+		// .surnames("Romero")
+		// .email("mariaromero@gmail.com")
+		// .password("password3")
+		// .city("Murcia")
+		// .department(departmentDao.findById(1L).get())
+		// .hobbie(hobbiesUser3)
+		// .yards(listaYard2)
+		// .build());
 
 		List<String> hobbiesUser4 = new ArrayList<>();
 		hobbiesUser4.add("equitacion");
 
 		// userDao.save(User.builder()
-		// 		.id(4)
-		// 		.name("Alex")
-		// 		.surnames("Sanchez")
-		// 		.email("alexsanchez@gmail.com")
-		// 		.password("password3")
-		// 		.city("Murcia")
-		// 		.department(departmentDao.findById(1L).get())
-		// 		.hobbie(hobbiesUser4)
-		// 		.yards(listaYard2)
-		// 		.build());
+		// .id(4)
+		// .name("Alex")
+		// .surnames("Sanchez")
+		// .email("alexsanchez@gmail.com")
+		// .password("password3")
+		// .city("Murcia")
+		// .department(departmentDao.findById(1L).get())
+		// .hobbie(hobbiesUser4)
+		// .yards(listaYard2)
+		// .build());
 
 		// userDao.save(User.builder()
-		// 		.id(5)
-		// 		.name("Sheila")
-		// 		.surnames("Nuñez")
-		// 		.email("sheilanuñez@gmail.com")
-		// 		.password("password1")
-		// 		.city("Valencia")
-		// 		.department(departmentDao.findById(1L).get())
-		// 		.phone("677888999")
-		// 		.build());
+		// .id(5)
+		// .name("Sheila")
+		// .surnames("Nuñez")
+		// .email("sheilanuñez@gmail.com")
+		// .password("password1")
+		// .city("Valencia")
+		// .department(departmentDao.findById(1L).get())
+		// .phone("677888999")
+		// .build());
 
 		postDao.save(Post.builder()
 				.id(1)

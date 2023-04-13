@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessException;
@@ -19,7 +20,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,7 +44,6 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/posts")
-@CrossOrigin(origins = {"*"})
 
 public class PostController {
     @Autowired
@@ -399,12 +398,5 @@ public class PostController {
         return responseEntity;
 
     }
-    /* */
-    //
-    // @GetMapping("/postsAll")
-    // public List<PostDto> findAll() {
-    // return postService.findAll().stream().map(p -> modelMapper.map(p,
-    // PostDto.class))
-    // .collect(Collectors.);
-    // }
+
 }
