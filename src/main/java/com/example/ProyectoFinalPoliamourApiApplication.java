@@ -61,36 +61,61 @@ public class ProyectoFinalPoliamourApiApplication implements CommandLineRunner {
 
 		departmentDao.save(Department.builder()
 				.name("Informatica")
+				.id(1)
 				.build());
 
 		departmentDao.save(Department.builder()
 				.name("RRHH")
+				.id(2)
 				.build());
+
+		departmentDao.save(Department.builder()
+				.name("Finanzas")
+				.id(3)
+				.build());
+
+		departmentDao.save(Department.builder()
+				.name("Support Manager")
+				.id(4)
+				.build());
+
 
 		Yard yard1 = yardDao.save(Yard.builder()
 				.id(1)
-				.name("Yard1")
+				.name("Java")
 				.department(departmentDao.findById(1L).get())
 				.build());
 
 		Yard yard2 = yardDao.save(Yard.builder()
 				.id(2)
-				.name("Yard2")
+				.name(".Net")
 				.department(departmentDao.findById(1L).get())
 				.build());
 
-		Yard yard3 = yardDao.save(Yard.builder()
-				.id(3)
-				.name("Yard3")
-				.department(departmentDao.findById(1L).get())
-				.build());
+		// Yard yard3 = yardDao.save(Yard.builder()
+		// 		.id(3)
+		// 		.name("Node")
+		// 		.department(departmentDao.findById(1L).get())
+		// 		.build());
+		
+		// Yard yard4 = yardDao.save(Yard.builder()
+		// 		.id(4)
+		// 		.name("PHP")
+		// 		.department(departmentDao.findById(1L).get())
+		// 		.build());
+
+		// Yard yard5 = yardDao.save(Yard.builder()
+		// 		.id(5)
+		// 		.name("Yard3")
+		// 		.department(departmentDao.findById(1L).get())
+		// 		.build());
 
 		List<Yard> listaYard1 = new ArrayList<>();
 		listaYard1.add(yard1);
 		listaYard1.add(yard2);
 
-		List<Yard> listaYard2 = new ArrayList<>();
-		listaYard2.add(yard3);
+		// List<Yard> listaYard2 = new ArrayList<>();
+		// listaYard2.add(yard3);
 
 		List<String> hobbiesUser1 = new ArrayList<>();
 		hobbiesUser1.add("baloncesto");
@@ -100,7 +125,7 @@ public class ProyectoFinalPoliamourApiApplication implements CommandLineRunner {
 				.id(1)
 				.name("Marina")
 				.surnames("Giner")
-				.email("marinaginer@gmail.com")
+				.email("marinag@poliamor.com")
 				.password("password1")
 				.city("Murcia")
 				.department(departmentDao.findById(1L).get())
@@ -109,63 +134,63 @@ public class ProyectoFinalPoliamourApiApplication implements CommandLineRunner {
 				.phone("677888999")
 				.build());
 
-		List<String> hobbiesUser2 = new ArrayList<>();
-		hobbiesUser2.add("futbol");
-		hobbiesUser2.add("lectura");
+		// List<String> hobbiesUser2 = new ArrayList<>();
+		// hobbiesUser2.add("futbol");
+		// hobbiesUser2.add("lectura");
 
-		userDao.save(User.builder()
-				.id(2)
-				.name("Paloma")
-				.surnames("Galan")
-				.email("palomagalan@gmail.com")
-				.password("password2")
-				.city("Valencia")
-				.department(departmentDao.findById(2L).get())
-				.hobbie(hobbiesUser2)
-				.phone("654632981")
-				.build());
+		// userDao.save(User.builder()
+		// 		.id(2)
+		// 		.name("Paloma")
+		// 		.surnames("Galan")
+		// 		.email("palomagalan@gmail.com")
+		// 		.password("password2")
+		// 		.city("Valencia")
+		// 		.department(departmentDao.findById(2L).get())
+		// 		.hobbie(hobbiesUser2)
+		// 		.phone("654632981")
+		// 		.build());
 
 		List<String> hobbiesUser3 = new ArrayList<>();
 		hobbiesUser3.add("senderismo");
 		hobbiesUser3.add("equitacion");
 
-		userDao.save(User.builder()
-				.id(3)
-				.name("Maria")
-				.surnames("Romero")
-				.email("mariaromero@gmail.com")
-				.password("password3")
-				.city("Murcia")
-				.department(departmentDao.findById(1L).get())
-				.hobbie(hobbiesUser3)
-				.yards(listaYard2)
-				.build());
+		// userDao.save(User.builder()
+		// 		.id(3)
+		// 		.name("Maria")
+		// 		.surnames("Romero")
+		// 		.email("mariaromero@gmail.com")
+		// 		.password("password3")
+		// 		.city("Murcia")
+		// 		.department(departmentDao.findById(1L).get())
+		// 		.hobbie(hobbiesUser3)
+		// 		.yards(listaYard2)
+		// 		.build());
 
 		List<String> hobbiesUser4 = new ArrayList<>();
 		hobbiesUser4.add("equitacion");
 
-		userDao.save(User.builder()
-				.id(4)
-				.name("Alex")
-				.surnames("Sanchez")
-				.email("alexsanchez@gmail.com")
-				.password("password3")
-				.city("Murcia")
-				.department(departmentDao.findById(1L).get())
-				.hobbie(hobbiesUser4)
-				.yards(listaYard2)
-				.build());
+		// userDao.save(User.builder()
+		// 		.id(4)
+		// 		.name("Alex")
+		// 		.surnames("Sanchez")
+		// 		.email("alexsanchez@gmail.com")
+		// 		.password("password3")
+		// 		.city("Murcia")
+		// 		.department(departmentDao.findById(1L).get())
+		// 		.hobbie(hobbiesUser4)
+		// 		.yards(listaYard2)
+		// 		.build());
 
-		userDao.save(User.builder()
-				.id(5)
-				.name("Sheila")
-				.surnames("Nuñez")
-				.email("sheilanuñez@gmail.com")
-				.password("password1")
-				.city("Valencia")
-				.department(departmentDao.findById(1L).get())
-				.phone("677888999")
-				.build());
+		// userDao.save(User.builder()
+		// 		.id(5)
+		// 		.name("Sheila")
+		// 		.surnames("Nuñez")
+		// 		.email("sheilanuñez@gmail.com")
+		// 		.password("password1")
+		// 		.city("Valencia")
+		// 		.department(departmentDao.findById(1L).get())
+		// 		.phone("677888999")
+		// 		.build());
 
 		postDao.save(Post.builder()
 				.id(1)
