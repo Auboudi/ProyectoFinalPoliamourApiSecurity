@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessException;
@@ -46,8 +45,7 @@ import jakarta.validation.Valid;
 @RequestMapping("/posts")
 
 public class PostController {
-    @Autowired
-    private ModelMapper modelMapper;
+
     @Autowired
     private PostService postService;
 
