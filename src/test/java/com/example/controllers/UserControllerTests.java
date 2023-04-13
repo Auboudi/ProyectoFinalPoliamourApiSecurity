@@ -1,5 +1,6 @@
 package com.example.controllers;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -8,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -37,7 +39,7 @@ import java.util.List;
 
 import static org.hamcrest.core.Is.is;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 
 
 @SpringBootTest
@@ -114,4 +116,39 @@ public class UserControllerTests {
 
     }
 
+    @DisplayName("Test guardar un usuario con usuario mockeado")
+    @Test
+    @WithMockUser(username = "admin@poliamor.com", 
+                  authorities = {"ADMIN", "USER"})
+
+    void testGuardarProductoConUserMocked() throws Exception {
+            Department department = Department.builder()
+                    .id(10L)
+                    .name("Dpto0")
+                    .build();    
+                
+             User user = User.builder()
+                    .id(100L)
+                    .name("Test User 0")
+                    .surnames("Test User 0")
+                    .email("correoTest2@poliamor.com")
+                    .password("password1")
+                    .department(department)
+                    .city("Murcia")
+                    .role(Role.USER)
+                    .build();
+
+        String jsonStringUser = objectMapper.writeValueAsString(user);
+
+        MockMultipartFile bytesArrayUser = new MockMultipartFile("user",
+                null, "application/json", jsonStringUser.getBytes());
+
+        mockMvc.perform(multipart("/users/add")
+                .file("fileUser", null)
+                .file(bytesArrayUser))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }    
+
 }
+
