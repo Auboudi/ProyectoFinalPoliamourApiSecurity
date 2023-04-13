@@ -1,6 +1,9 @@
 package com.example.entities;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
+
+import org.springframework.format.annotation.DateTimeFormat;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -37,6 +40,9 @@ public class Post implements Serializable {
     private String text;
 
     private String imagePost;
+
+    @DateTimeFormat
+    private LocalDateTime fechaPublicacion;
 
     // RELACION POST - USER
 

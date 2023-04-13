@@ -49,6 +49,7 @@ public class PostServiceImpl implements PostService {
     public List<Post> findByUserId(long id) {
         return postDao.findByUserId(id);
     }
+
     @Override
     public List<Post> findByEmail(String email) {
         return postDao.findByEmail(email);
@@ -59,8 +60,4 @@ public class PostServiceImpl implements PostService {
         return postDao.findAll();
     }
 
-    
-
-
-    
 }

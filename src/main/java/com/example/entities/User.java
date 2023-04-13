@@ -1,6 +1,7 @@
 package com.example.entities;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -22,6 +23,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,12 +31,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table(name="user")
+@Table(name = "user")
 
 public class User implements Serializable {
 
@@ -69,10 +71,11 @@ public class User implements Serializable {
 
     private String imageUser;
 
+    @Past
+    private LocalDate fechaNacimiento;
+
     @Enumerated(EnumType.STRING)
     private Role role;
-
- 
 
     // 1. RELACION USER-DEPARTMENT
 
@@ -81,14 +84,9 @@ public class User implements Serializable {
 
     // 2. RELACION USER-YARDS (MANYTOMANY)
 
-    @JoinTable(
-        name = "rel_yards_users",
-        joinColumns = @JoinColumn(name = "user_id", nullable = false),
-        inverseJoinColumns = @JoinColumn(name="yard_id", nullable = false)
-    )
+    @JoinTable(name = "rel_yards_users", joinColumns = @JoinColumn(name = "user_id", nullable = false), inverseJoinColumns = @JoinColumn(name = "yard_id", nullable = false))
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.REFRESH)
     List<Yard> yards;
-    
 
     // 5. RELACION USER - POSTS
 
@@ -96,7 +94,4 @@ public class User implements Serializable {
     @JsonIgnore
     private List<Post> posts;
 
-    
 }
-
-

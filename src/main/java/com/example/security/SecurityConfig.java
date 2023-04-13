@@ -38,8 +38,8 @@ public class SecurityConfig {
 
     }
 
-    /*CONTRASEÑA */
-    
+    /* CONTRASEÑA */
+
     // public static void main(String[] args) {
     // System.out.println(new
     // SecurityConfig().passwordEncoder().encode("Temp2023$$"));

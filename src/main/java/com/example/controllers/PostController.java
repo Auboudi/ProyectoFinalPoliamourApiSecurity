@@ -1,6 +1,7 @@
 package com.example.controllers;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -72,6 +73,7 @@ public class PostController {
                 Pageable pageable = PageRequest.of(page, size, sortById);
                 Page<Post> postsPaginados = postService.findAll(pageable);
                 posts = postsPaginados.getContent();
+
                 responseEntity = new ResponseEntity<List<Post>>(posts, HttpStatus.OK);
             } catch (Exception e) {
                 responseEntity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -124,12 +126,15 @@ public class PostController {
 
             responseAsMap.put("info de la imagen: ", fileUploadResponse);
         }
+        // Date date = Date.from(Instant.now());
+        LocalDateTime datetime = LocalDateTime.now();
 
         Post postDB = postService.save(post);
 
         try {
 
             if (postDB != null) {
+                postDB.setFechaPublicacion(datetime);
                 String message = "El post se ha creado correctamente";
                 responseAsMap.put("mensaje", message);
                 responseAsMap.put("post", postDB);
@@ -337,7 +342,6 @@ public class PostController {
         try {
 
             Post post = postService.findbyId(id);
-
             if (post != null) {
 
                 postService.delete(post);
@@ -363,13 +367,6 @@ public class PostController {
     public ResponseEntity<String> deleteUserPosts(@PathVariable(name = "id") Integer id,
             @PathVariable(name = "currentUserEmail") String currentUserEmail) {
         ResponseEntity<String> responseEntity = null;
-
-        // if (!currentUserEmail.equals((user1.getEmail()))) {
-
-        // String mensajeError = "Sólo puede actualizar su perfil";
-        // responseEntity = new ResponseEntity<String>(mensajeError, HttpStatus.OK);
-
-        // }
 
         try {
             Post post = postService.findbyId(id);

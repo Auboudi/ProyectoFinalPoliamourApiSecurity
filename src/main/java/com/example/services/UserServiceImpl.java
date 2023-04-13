@@ -24,8 +24,6 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserDao userDao;
 
-    
-
     @Override
     public Page<User> findAll(Pageable pageable) {
         return userDao.findAll(pageable);
@@ -33,7 +31,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> findAll(Sort sort) {
-    return userDao.findAll(sort);    
+        return userDao.findAll(sort);
     }
 
     @Override
@@ -53,18 +51,17 @@ public class UserServiceImpl implements UserService {
         userDao.delete(user);
     }
 
-    //implementacion métodos security
+    // implementacion métodos security
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-   
     @Override
     public User add(User user) {
         Optional<User> theUser = userRepository.findByEmail(user.getEmail());
 
-        if(theUser.isPresent()) {
-            
+        if (theUser.isPresent()) {
+
             return null;
 
         }
@@ -87,26 +84,23 @@ public class UserServiceImpl implements UserService {
     @Override
     public User findByEmail(String email) {
         return userRepository
-            .findByEmail(email)
-            .orElseThrow(() -> 
-               new UsernameNotFoundException("No existe el usuario con el email: " + email));
+                .findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("No existe el usuario con el email: " + email));
     }
 
     @Override
     public User update(User user) {
 
         User existingUser = userRepository.findById(user.getId())
-                    .orElseThrow(() -> new UsernameNotFoundException("No existe user con dicho email"));
-        
+                .orElseThrow(() -> new UsernameNotFoundException("No existe user con dicho email"));
+
         existingUser.setName(user.getName());
         existingUser.setSurnames(user.getSurnames());
         existingUser.setEmail(user.getEmail());
         existingUser.setPassword(passwordEncoder.encode(user.getPassword()));
         existingUser.setRole(user.getRole());
-        
+
         return userRepository.save(existingUser);
     }
-
-
 
 }

@@ -12,8 +12,7 @@ import com.example.entities.Post;
 
 public interface PostDao extends JpaRepository<Post, Long> {
 
-    // @Query(value = "select p from Post p left join fetch p.user")
-        @Query(value = "select  p, u.email from Post p left join fetch p.user u")
+    @Query(value = "select  p, u.email from Post p left join fetch p.user u")
 
     public List<Post> findAll(Sort sort);
 
