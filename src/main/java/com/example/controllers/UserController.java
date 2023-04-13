@@ -416,8 +416,6 @@ public class UserController {
         return responseEntity;
     }
 
-  
-
     // BUSQUEDA PARA USERS
 
     /* 1. LISTADO USER */
@@ -435,12 +433,10 @@ public class UserController {
     @GetMapping("/find/{email}")
     public ResponseEntity<UserDto> findByEmail(@PathVariable(name = "email") String email) {
 
-
         User userNormal = userService.findByEmail(email);
         UserDto userDtoEmail = modelMapper.map(userNormal, UserDto.class);
         return new ResponseEntity<>(userDtoEmail, HttpStatus.OK);
     }
-
 
     /* 3. UPDATE USER */
 
@@ -531,22 +527,21 @@ public class UserController {
         return responseEntity;
     }
 
- /*4. ORDENAR POR GRUPOS */
+    /* 4. ORDENAR POR GRUPOS */
 
- //ORDENADO POR YARD
-//  @GetMapping("/yards")
+    // ORDENADO POR YARD
+    // @GetMapping("/yards")
 
-//  public ResponseEntity <Map <Object, List<UserDto>>> listaYards() {
-//  Map<Object, List<UserDto>> usuariosPorYards = new HashMap<>();
-//  List<UserDto> usuariosDto = userService.findAll().stream().map(p ->
-//  modelMapper.map(p, UserDto.class))
-//  .collect(Collectors.toList());
-//   usuariosPorYards = usuariosDto.stream().collect(Collectors.groupingBy(p ->
-//  p.getYards()));
+    // public ResponseEntity <Map <Object, List<UserDto>>> listaYards() {
+    // Map<Object, List<UserDto>> usuariosPorYards = new HashMap<>();
+    // List<UserDto> usuariosDto = userService.findAll().stream().map(p ->
+    // modelMapper.map(p, UserDto.class))
+    // .collect(Collectors.toList());
+    // usuariosPorYards = usuariosDto.stream().collect(Collectors.groupingBy(p ->
+    // p.getYards()));
 
-//   return new ResponseEntity<>(usuariosPorYards, HttpStatus.OK);
+    // return new ResponseEntity<>(usuariosPorYards, HttpStatus.OK);
 
-// }
+    // }
 
-    
 }
