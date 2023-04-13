@@ -275,7 +275,7 @@ public class UserController {
             FileUploadResponse fileUploadResponse = FileUploadResponse
                     .builder()
                     .fileName(fileCode + "-" + fileUser.getOriginalFilename())
-                    .downloadURI("/users/downloadFile/" + fileCode + "-" + fileUser.getOriginalFilename())
+                    .downloadURI("/users/admin/downloadFile/" + fileCode + "-" + fileUser.getOriginalFilename())
                     .size(fileUser.getSize())
                     .build();
 
@@ -398,7 +398,7 @@ public class UserController {
                 FileUploadResponse fileUploadResponse = FileUploadResponse
                         .builder()
                         .fileName(fileCode + "-" + fileUser.getOriginalFilename())
-                        .downloadURI("/users/downloadFile/" + fileCode + "-" + fileUser.getOriginalFilename())
+                        .downloadURI("/users/admin/downloadFile/" + fileCode + "-" + fileUser.getOriginalFilename())
                         .size(fileUser.getSize())
                         .build();
     
