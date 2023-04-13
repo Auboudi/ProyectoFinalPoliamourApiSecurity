@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -155,8 +156,12 @@ public class UserRepositoryTests {
 
         // Then
 
-        assertThat(usuarios).isNotNull();
-        assertThat(usuarios).size().isEqualTo(7);
+    assertThat(usuarios).isNotNull();
+    assertThat(usuarios).size().isEqualTo(9);
+
+
+
+
 
     }
 
@@ -167,7 +172,7 @@ public class UserRepositoryTests {
         // Given
 
         departmentDao.save(dpto0);
-        yardDao.save(yard0);
+
 
         userRepository.save(user0);
 
@@ -188,7 +193,6 @@ public class UserRepositoryTests {
         // Given
 
         departmentDao.save(dpto0);
-        yardDao.save(yard0);
         userRepository.save(user0);
 
         // When
@@ -208,5 +212,38 @@ public class UserRepositoryTests {
         assertThat(userUpdated.getSurnames()).isEqualTo("UPDATE");
 
     }
+
+    @DisplayName("Test para eliminar un user")
+    @Test
+    public void testDeleteUser() {
+
+        // Given
+
+        departmentDao.save(dpto0);
+        yardDao.save(yard0);
+
+        userRepository.save(user0);
+
+        // When 
+
+        userRepository.delete(user0);
+        Optional<User> optionalUser = userRepository.findByEmail(user0.getEmail());
+
+        // Then 
+
+        assertThat(optionalUser).isEmpty();
+
+
+
+    }
+
+
+
+
+
+
+
+
+    
 
 }

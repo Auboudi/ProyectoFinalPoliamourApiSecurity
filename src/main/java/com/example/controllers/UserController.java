@@ -238,8 +238,6 @@ public class UserController {
             @Valid @RequestPart(name = "user") User user,
             BindingResult result,
             @RequestPart(name = "fileUser", required = false) MultipartFile fileUser)
-            // ,
-            // @RequestPart(name = "email", required = false) String email)
             throws IOException {
 
         Map<String, Object> responseAsMap = new HashMap<>();
@@ -355,7 +353,7 @@ public class UserController {
     /* OPCIONES HABILITADAS PARA USERS */
 
     /* 1. AÑADIR USUARIOS (HABILITADA PARA AMBOS) */
-    @PostMapping(value = "/add", consumes = "multipart/form-data")
+    @PostMapping(value = "/add", consumes = {"multipart/form-data", "application/json"})
     @Transactional
     public ResponseEntity<Map<String, Object>> insert(@Valid @RequestPart(name = "user") User user,
             BindingResult result,
