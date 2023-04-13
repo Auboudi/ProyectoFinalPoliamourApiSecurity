@@ -1,5 +1,7 @@
 package com.example.controllers;
 
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -64,6 +66,7 @@ public class UserControllerTests {
     @Autowired
     private WebApplicationContext context;
 
+    @BeforeEach
     public void setUp(){
 
         mockMvc = MockMvcBuilders
@@ -111,7 +114,8 @@ public class UserControllerTests {
         // then
         response.andDo(print())
         .andExpect(status().isUnauthorized());
-
+        
+   //      String prueba = JSONObject().put("nombre","Maria");
     }
 
 }

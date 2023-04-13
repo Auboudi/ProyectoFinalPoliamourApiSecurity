@@ -60,7 +60,7 @@ public class User implements Serializable {
     private String email;
 
     @NotEmpty(message = "El campo <contraseña> no puede estar vacío")
-    @JsonIgnore
+
     private String password;
 
     private String city;
