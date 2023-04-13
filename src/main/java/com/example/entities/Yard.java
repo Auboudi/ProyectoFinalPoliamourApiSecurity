@@ -40,9 +40,9 @@ public class Yard implements Serializable {
 
     // 1. RELACION YARD-DEPARTMENT
 
-    @ManyToOne(fetch =FetchType.LAZY, cascade = CascadeType.MERGE)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     @JsonIgnore
-    Department department; 
+    Department department;
 
     // 2. RELACION YARD-USER (MANYTOMANY)
 

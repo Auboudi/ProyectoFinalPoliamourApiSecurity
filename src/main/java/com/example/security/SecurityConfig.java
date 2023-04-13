@@ -1,6 +1,5 @@
 package com.example.security;
 
-
 import static org.springframework.security.config.Customizer.withDefaults;
 
 import org.springframework.context.annotation.Bean;
@@ -15,11 +14,11 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private static final String[] SECURED_URLs = {"/users/admin/**"};
+    private static final String[] SECURED_URLs = { "/users/admin/**", "posts/admin/**" };
 
-    private static final String[] UN_SECURED_URLs = {"/users/all","users/find/**" , "posts/postsAll", "users/updateUser", "users/add", 
-"users/yards", "posts/all"};    
-
+    private static final String[] UN_SECURED_URLs = { "/users/add/", "users/all", "users/find", "users/update",
+            "users/updateUser",
+            "posts/all", "posts/add/{id}/{currentEmail}", "posts/find/**", "posts/downloadFile/{fileCode}", "posts/delete/**" };
 
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -28,19 +27,22 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    http.csrf().disable();
-    http.authorizeHttpRequests()
-            .requestMatchers(UN_SECURED_URLs).permitAll().and()
-            .authorizeHttpRequests().requestMatchers(SECURED_URLs)
-            .hasAuthority("ADMIN").anyRequest()
-            .authenticated().and().httpBasic(withDefaults());
+        http.csrf().disable();
+        http.authorizeHttpRequests()
+                .requestMatchers(UN_SECURED_URLs).permitAll().and()
+                .authorizeHttpRequests().requestMatchers(SECURED_URLs)
+                .hasAuthority("ADMIN").anyRequest()
+                .authenticated().and().httpBasic(withDefaults());
 
         return http.build();
 
     }
 
-    public static void main(String[] args) {
-         System.out.println(new SecurityConfig().passwordEncoder().encode("Temp2023$$"));
-    }
+    /* CONTRASEÑA */
+
+     public static void main(String[] args) {
+     System.out.println(new
+     SecurityConfig().passwordEncoder().encode("Temp2023$$"));
+     }
 
 }

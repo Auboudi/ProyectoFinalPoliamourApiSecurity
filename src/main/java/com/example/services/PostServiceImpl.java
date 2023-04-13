@@ -51,12 +51,13 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    public List<Post> findByEmail(String email) {
+        return postDao.findByEmail(email);
+    }
+
+    @Override
     public List<Post> findAll() {
         return postDao.findAll();
     }
 
-    
-
-
-    
 }
