@@ -38,7 +38,7 @@ public class Department implements Serializable {
     private String name;
 
     // 1. RELACIÓN DEPARTMENT-USER
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, mappedBy = "department")
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE, mappedBy = "department")
     @JsonIgnore
     private List<User> users;
 
