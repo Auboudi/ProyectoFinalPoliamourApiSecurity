@@ -238,8 +238,6 @@ public class UserController {
             @Valid @RequestPart(name = "user") User user,
             BindingResult result,
             @RequestPart(name = "fileUser", required = false) MultipartFile fileUser)
-            // ,
-            // @RequestPart(name = "email", required = false) String email)
             throws IOException {
 
         Map<String, Object> responseAsMap = new HashMap<>();

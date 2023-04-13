@@ -1,5 +1,13 @@
 package com.example.controllers;
 
+
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,15 +16,13 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.example.dao.DepartmentDao;
+
 import com.example.entities.Department;
 import com.example.entities.Role;
 import com.example.entities.User;
@@ -24,27 +30,19 @@ import com.example.entities.Yard;
 import com.example.services.UserService;
 import com.example.utilities.FileDownloadUtil;
 import com.example.utilities.FileUploadUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-import static org.mockito.ArgumentMatchers.any;
-// Para seguir el enfoque BDD con Mockito
-import static org.mockito.BDDMockito.given;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
+
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.hamcrest.core.Is.is;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @AutoConfigureTestDatabase(replace = Replace.NONE)
+@Transactional
 public class UserControllerTests {
     
     @Autowired
@@ -52,7 +50,6 @@ public class UserControllerTests {
 
     @MockBean
     private UserService userService;
-
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -66,6 +63,7 @@ public class UserControllerTests {
     @Autowired
     private WebApplicationContext context;
 
+    @BeforeEach
     public void setUp(){
 
         mockMvc = MockMvcBuilders
@@ -88,31 +86,25 @@ public class UserControllerTests {
         .id(100L)
         .name("Test User0")
         .surnames("Test User 0")
-        .email("correoTest1000@gmail.com")
+        .email("correoTest1000@poliamor")
         .password("password")
         .department(department)
         .city("Murcia")
         .role(Role.USER)
         .build();
 
-        given(userService
-        .save(any(User.class)))
-        .willAnswer(invocation -> invocation.getArgument(0));
-        given(userService.save(any(User.class)))
-        .willAnswer(invocation -> invocation.getArgument(0));
+        String jsonStringUser = objectMapper.writeValueAsString(user);
 
-        // when
 
-        String jsonStringProduct = objectMapper.writeValueAsString(user);
-        System.out.println(jsonStringProduct);
-        ResultActions response = mockMvc
-                .perform(post("/users/add")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonStringProduct));
+        MockMultipartFile bytesArrayUSer = new MockMultipartFile("user",
+                null, "application/json", jsonStringUser.getBytes());
 
-        // then
-        response.andDo(print())
-        .andExpect(status().isUnauthorized());
+        mockMvc.perform(multipart("/users/add")
+                .file("userFile", null)
+                .file(bytesArrayUSer))
+                .andExpect(status().isUnauthorized())
+                .andDo(print());
+      
 
     }
 
@@ -121,20 +113,27 @@ public class UserControllerTests {
     @WithMockUser(username = "admin@poliamor.com", 
                   authorities = {"ADMIN", "USER"})
 
-    void testGuardarProductoConUserMocked() throws Exception {
+    void testGuardarUserConUserMocked() throws Exception {
             Department department = Department.builder()
-                    .id(10L)
                     .name("Dpto0")
                     .build();    
+        Yard yard = Yard.builder()
+                .name("Yard")
+                .department(department)
+                .build();
+        List<Yard> yards = new ArrayList<>();
+
+        yards.add(yard);
+
                 
              User user = User.builder()
-                    .id(100L)
                     .name("Test User 0")
                     .surnames("Test User 0")
-                    .email("correoTest2@poliamor.com")
+                    .email("correo@poliamor.com")
                     .password("password1")
                     .department(department)
                     .city("Murcia")
+                    .yards(yards)
                     .role(Role.USER)
                     .build();
 
