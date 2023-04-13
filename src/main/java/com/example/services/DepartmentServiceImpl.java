@@ -9,7 +9,7 @@ import com.example.dao.DepartmentDao;
 import com.example.entities.Department;
 
 @Service
-public class DepartmentServiceImpl implements DepartmentService{
+public class DepartmentServiceImpl implements DepartmentService {
 
     @Autowired
     private DepartmentDao departmentDao;
@@ -33,5 +33,5 @@ public class DepartmentServiceImpl implements DepartmentService{
     public void delete(Department department) {
         departmentDao.delete(department);
     }
-    
+
 }

@@ -44,7 +44,6 @@ import com.example.services.UserService;
 import com.example.services.YardService;
 import com.example.utilities.FileDownloadUtil;
 import com.example.utilities.FileUploadUtil;
-import com.fasterxml.jackson.databind.deser.DataFormatReaders.Match;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -381,19 +380,7 @@ public class UserController {
             return responseEntity;
 
         }
-        if (!fileUser.isEmpty()) {
-            String fileCode = fileUploadUtil.saveFile(fileUser.getOriginalFilename(), fileUser);
-            user.setImageUser(fileCode + "-" + fileUser.getOriginalFilename());
-
-            FileUploadResponse fileUploadResponse = FileUploadResponse
-                    .builder()
-                    .fileName(fileCode + "-" + fileUser.getOriginalFilename())
-                    .downloadURI("/users/downloadFile/" + fileCode + "-" + fileUser.getOriginalFilename())
-                    .size(fileUser.getSize())
-                    .build();
-
-            responseAsMap.put("info de la imagen: ", fileUploadResponse);
-        }
+        
         User userDB = userService.add(user);
         try {
             if (userDB != null) {
@@ -401,7 +388,19 @@ public class UserController {
                 responseAsMap.put("mensaje", message);
                 responseAsMap.put("usuario", userDB);
                 responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.CREATED);
-            } else {
+                if (!fileUser.isEmpty()) {
+                    String fileCode = fileUploadUtil.saveFile(fileUser.getOriginalFilename(), fileUser);
+                    user.setImageUser(fileCode + "-" + fileUser.getOriginalFilename());
+        
+                    FileUploadResponse fileUploadResponse = FileUploadResponse
+                            .builder()
+                            .fileName(fileCode + "-" + fileUser.getOriginalFilename())
+                            .downloadURI("/users/downloadFile/" + fileCode + "-" + fileUser.getOriginalFilename())
+                            .size(fileUser.getSize())
+                            .build();
+        
+                    responseAsMap.put("info de la imagen: ", fileUploadResponse);
+                }} else {
                 String message = "El usuario no se ha creado correctamente";
                 responseAsMap.put("mensaje", message);
                 responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.BAD_REQUEST);
@@ -421,10 +420,35 @@ public class UserController {
     /* 1. LISTADO USER */
 
     @GetMapping("/all")
-    public ResponseEntity<List<UserDto>> findAllUsers() {
-        List<UserDto> listaUsuarios = userService.findAll().stream().map(p -> modelMapper.map(p, UserDto.class))
-                .collect(Collectors.toList());
-        return new ResponseEntity<>(listaUsuarios, HttpStatus.OK);
+    public ResponseEntity<List<UserDto>> findAllUsers(@RequestParam(name = "page", required = false) Integer page,
+            @RequestParam(name = "size", required = false) Integer size) {
+
+        ResponseEntity<List<UserDto>> responseEntity = null;
+        List<UserDto> users = new ArrayList<>();
+        Sort sortByName = Sort.by("name");
+
+        if (page != null && size != null) {
+            try {
+                Pageable pageable = PageRequest.of(page, size, sortByName);
+                Page<User> usersPaginados = userService.findAll(pageable);
+                users = usersPaginados.getContent().stream().map(p -> modelMapper.map(p, UserDto.class))
+                        .collect(Collectors.toList());
+                responseEntity = new ResponseEntity<List<UserDto>>(users, HttpStatus.OK);
+            } catch (Exception e) {
+                responseEntity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+        } else {
+            try {
+                users = userService.findAll(sortByName).stream().map(p -> modelMapper.map(p, UserDto.class))
+                        .collect(Collectors.toList());
+
+                responseEntity = new ResponseEntity<List<UserDto>>(users, HttpStatus.OK);
+
+            } catch (Exception e) {
+                responseEntity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            }
+        }
+        return responseEntity;
     }
 
     /* 2. BUSCAR USUARIOS */
@@ -432,23 +456,29 @@ public class UserController {
     /* 2.1. BUSCAR POR EMAIL */
     @GetMapping("/find/{email}")
     public ResponseEntity<UserDto> findByEmail(@PathVariable(name = "email") String email) {
+        ResponseEntity<UserDto> responseEntity = null;
 
-        User userNormal = userService.findByEmail(email);
-        UserDto userDtoEmail = modelMapper.map(userNormal, UserDto.class);
-        return new ResponseEntity<>(userDtoEmail, HttpStatus.OK);
+        try {
+            User userNormal = userService.findByEmail(email);
+            UserDto userDtoEmail = modelMapper.map(userNormal, UserDto.class);
+            responseEntity = new ResponseEntity<>(userDtoEmail, HttpStatus.OK);
+
+        } catch (Exception e) {
+            responseEntity = new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        }
+        return responseEntity;
     }
 
     /* 3. UPDATE USER */
 
-    @PutMapping("/updateUser/{currentUserEmail}")
+    @PutMapping("/update/{currentUserEmail}")
     @Transactional
     public ResponseEntity<Map<String, Object>> update(
             @Valid @RequestPart(name = "user") User user,
             BindingResult result,
             @PathVariable(name = "currentUserEmail") String currentUserEmail,
             @RequestPart(name = "fileUser", required = false) MultipartFile fileUser)
-            // ,
-            // @RequestPart(name = "email", required = false) String email)
             throws IOException {
 
         Map<String, Object> responseAsMap = new HashMap<>();
@@ -532,13 +562,14 @@ public class UserController {
     // ORDENADO POR YARD
     // @GetMapping("/yards")
 
-    // public ResponseEntity <Map <Object, List<UserDto>>> listaYards() {
+    // public ResponseEntity <Map <UserDto, List<Post>>> lista() {
     // Map<Object, List<UserDto>> usuariosPorYards = new HashMap<>();
     // List<UserDto> usuariosDto = userService.findAll().stream().map(p ->
     // modelMapper.map(p, UserDto.class))
     // .collect(Collectors.toList());
-    // usuariosPorYards = usuariosDto.stream().collect(Collectors.groupingBy(p ->
-    // p.getYards()));
+    // usuariosPorYards =
+    // usuariosDto.stream().map(Object).collect(Collectors.groupingBy(p ->
+    // p.getPosts());
 
     // return new ResponseEntity<>(usuariosPorYards, HttpStatus.OK);
 
