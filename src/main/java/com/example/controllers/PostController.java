@@ -90,11 +90,12 @@ public class PostController {
     }
 
     /* 2. CREACIÓN DE POST */
-    @PostMapping(value = "/add/{email}", consumes = "multipart/form-data")
+    @PostMapping(value = "/add/{id}/{currentEmail}", consumes = "multipart/form-data")
     @Transactional
     public ResponseEntity<Map<String, Object>> insert(@Valid @RequestPart(name = "post") Post post,
             BindingResult result,
-            @PathVariable(name = "email", required = true) String email,
+            @PathVariable(name = "id", required = true) long id,
+            @PathVariable(name = "currentEmail", required = true) String currentEmail,
             @RequestPart(name = "filePost", required = false) MultipartFile filePost) throws IOException {
 
         Map<String, Object> responseAsMap = new HashMap<>();
@@ -114,27 +115,33 @@ public class PostController {
 
         }
 
-        if (!filePost.isEmpty()) {
-            String fileCode = fileUploadUtil.saveFile(filePost.getOriginalFilename(), filePost);
-            post.setImagePost(fileCode + "-" + filePost.getOriginalFilename());
-
-            FileUploadResponse fileUploadResponse = FileUploadResponse
-                    .builder()
-                    .fileName(fileCode + "-" + filePost.getOriginalFilename())
-                    .downloadURI("/posts/downloadFile/" + fileCode + "-" + filePost.getOriginalFilename())
-                    .size(filePost.getSize())
-                    .build();
-
-            responseAsMap.put("info de la imagen: ", fileUploadResponse);
-        }
         // Date date = Date.from(Instant.now());
         LocalDateTime datetime = LocalDateTime.now();
 
         Post postDB = postService.save(post);
-        User user1 = userService.findByEmail(email);
-        
-        try {
+        User user1 = userService.findbyId(id);
 
+        if (!currentEmail.equals(user1.getEmail())) {
+            String mensajeError = "Sólo puede postear desde su usuario";
+            responseAsMap.put("error", mensajeError);
+            return new ResponseEntity<>(responseAsMap, HttpStatus.BAD_REQUEST);
+
+        }
+
+        try {
+            if (!filePost.isEmpty()) {
+                String fileCode = fileUploadUtil.saveFile(filePost.getOriginalFilename(), filePost);
+                post.setImagePost(fileCode + "-" + filePost.getOriginalFilename());
+
+                FileUploadResponse fileUploadResponse = FileUploadResponse
+                        .builder()
+                        .fileName(fileCode + "-" + filePost.getOriginalFilename())
+                        .downloadURI("/posts/downloadFile/" + fileCode + "-" + filePost.getOriginalFilename())
+                        .size(filePost.getSize())
+                        .build();
+
+                responseAsMap.put("info de la imagen: ", fileUploadResponse);
+            }
             if (postDB != null) {
                 postDB.setFechaPublicacion(datetime);
                 postDB.setUser(user1);

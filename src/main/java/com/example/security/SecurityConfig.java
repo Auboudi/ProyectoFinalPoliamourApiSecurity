@@ -17,8 +17,8 @@ public class SecurityConfig {
     private static final String[] SECURED_URLs = { "/users/admin/**", "posts/admin/**" };
 
     private static final String[] UN_SECURED_URLs = { "/users/add/", "users/all", "users/find", "users/update",
-            "users/updateUser", "users/add",
-            "posts/all", "posts/add/{email}", "posts/find/**", "posts/downloadFile/{fileCode}", "posts/delete/**" };
+            "users/updateUser",
+            "posts/all", "posts/add/{id}/{currentEmail}", "posts/find/**", "posts/downloadFile/{fileCode}", "posts/delete/**" };
 
     @Bean
     PasswordEncoder passwordEncoder() {

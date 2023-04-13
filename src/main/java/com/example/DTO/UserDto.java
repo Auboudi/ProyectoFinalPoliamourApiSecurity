@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 
 public class UserDto implements Serializable {
 
-    private long id;
+
     private String name;
     private String surnames;
     private String city;
