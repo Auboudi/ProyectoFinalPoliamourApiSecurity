@@ -1,7 +1,9 @@
 package com.example.controllers;
 
 
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -13,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -21,6 +24,7 @@ import com.example.entities.Department;
 import com.example.entities.Role;
 import com.example.entities.User;
 import com.example.entities.Yard;
+import com.example.services.UserRepository;
 import com.example.services.UserService;
 import com.example.utilities.FileDownloadUtil;
 import com.example.utilities.FileUploadUtil;
@@ -53,6 +57,9 @@ public class UserControllerTests {
     @MockBean
     private UserService userService;
 
+    @MockBean
+    private UserRepository userRepository;
+
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -66,12 +73,31 @@ public class UserControllerTests {
     @Autowired
     private WebApplicationContext context;
 
+    private User user;
+
+    private Department department;
+
     @BeforeEach
     public void setUp(){
 
         mockMvc = MockMvcBuilders
             .webAppContextSetup(context)
             .apply(springSecurity())
+            .build();
+
+        department = Department.builder().name("Dpto").id(100L).build();
+
+        
+
+        user = User.builder()
+            .id(100L)
+            .name("Test User0")
+            .surnames("Test User 0")
+            .email("correoTest1000@gmail.com")
+            .password("password")
+            .city("Murcia")
+            .department(department)
+            .role(Role.USER)
             .build();
 
 
@@ -115,7 +141,21 @@ public class UserControllerTests {
         response.andDo(print())
         .andExpect(status().isUnauthorized());
         
-   //      String prueba = JSONObject().put("nombre","Maria");
+
     }
 
-}
+
+                
+        @DisplayName("Test listar usuarios con usuario mockeado")
+        @Test
+        @WithMockUser(username = "admin@poliamor.com", authorities = {"ADMIN", "USER"})
+        void testListarUsuarios() throws Exception {
+
+                mockMvc.perform(MockMvcRequestBuilders.get("/users/admin/all"))
+                .andDo(print()).andExpect(status().isOk());
+                             
+                                               
+
+                        }
+        
+        }

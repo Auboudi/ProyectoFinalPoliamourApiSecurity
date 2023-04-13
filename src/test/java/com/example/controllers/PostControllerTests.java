@@ -1,4 +1,5 @@
 package com.example.controllers;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -10,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -122,6 +124,17 @@ public class PostControllerTests {
     
         }
 
+        @DisplayName("Test listar posts con usuario mockeado")
+        @Test
+        @WithMockUser(username = "admin@poliamor.com", authorities = {"ADMIN", "USER"})
+        void testListarPosts() throws Exception {
+
+                mockMvc.perform(MockMvcRequestBuilders.get("/posts/all"))
+                .andDo(print()).andExpect(status().isOk());
+                             
+                                               
+
+                        }
 
 
        
